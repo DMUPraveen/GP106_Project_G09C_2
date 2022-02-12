@@ -11,7 +11,6 @@ import pyfirmata
 
 #Arduino Setup
 board = Arduino('COM7')
-topic="G9C_Voltage"
 
 #Define the pins
 resistor_pin=board.get_pin('a:0:i')
