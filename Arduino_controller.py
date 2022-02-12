@@ -4,6 +4,8 @@ from morse.Morse_Decoder import Morse_Decoder,MORSE_ENCODING
 from time import time
 from typing import List
 
+#This is a new comment
+
 COM_PORT = 'COM3'
 
 def call_back(code: str):
