@@ -12,8 +12,8 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-def convert_to_morse(message:str)->str:
-    return convertToMorse(message).replace('343','4')
+# def convert_to_morse(message:str)->str:
+#     return convertToMorse(message).replace('343','4')
 
 
 class Debug_Timer:
@@ -128,7 +128,7 @@ def test_function(message:str):
     '''
 
     timer = Debug_Timer()
-    morse = convert_to_morse(message)
+    morse = convertToMorse(message)
     #print(morse)
     encoding = [MORSE_ENCODING(int(i)) for i in morse]
     #print(encoding)
@@ -175,7 +175,7 @@ def test_function_with_noise(message:str):
     '''
 
     timer = Debug_Timer()
-    morse = convert_to_morse(message)
+    morse = convertToMorse(message)
     #print(morse)
     encoding = [MORSE_ENCODING(int(i)) for i in morse]
     #print(encoding)
