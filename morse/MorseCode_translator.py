@@ -1,4 +1,4 @@
-import morse_lib
+from . import morse_lib
 
 # dictionary for signals
 inputData = {

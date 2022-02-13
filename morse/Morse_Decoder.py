@@ -1,5 +1,7 @@
 
+
 from typing import Callable, List
+from .MorseCode_translator import convertToWords
 import enum
 
 
@@ -54,6 +56,9 @@ SIGNAL_MAINTAIN_MIN_LIMIT = 0.1 # time a signal has to maintained for it to be c
 SIGNAL_TIMEOUT_LIMIT = 10       # maximum time the signal can be kept at a some state without changing before the deocder decides the signal has ended
 MAX_WORD_COUNT = 100            # The maximum number of dots and dashes a message can have (not implemented as of yet)
 
+def convert_to_english(encoding:str)->str:
+    return convertToWords(encoding.replace('4','343'))
+
 
 class Morse_Decoder:
     '''
@@ -94,6 +99,7 @@ class Morse_Decoder:
         # Not necessary to store whether they are high or low since the starting pulse is always high and high low pulses occur alternatively
 
     def start_pending_state(self, now:float) -> None:
+        #print("start pending")
         '''
         utility function to,
         starts the pending state -- when a state change happens
@@ -104,6 +110,7 @@ class Morse_Decoder:
         self.pending_start = now
 
     def reject_pending_state(self) -> None:
+        #print("reject pending")
         '''
         utility function to,
         reject the state change as noise
@@ -115,15 +122,17 @@ class Morse_Decoder:
     def block(self)->None:
         self.state = STATES.BLOCKED
 
-    def unblock_and_reset(self,current_time:float)->None:
-        self.state = STATES.IDLE                      
-        self.last_time = current_time                
-        self.pending_start = current_time           
-        self.state_before_pending = STATES.IDLE     
-        self.duratons.clear()    
+    def if_blocked_unblock_and_reset(self,current_time:float)->None:
+        if(self.state == STATES.BLOCKED):
+            self.state = STATES.IDLE                      
+            self.last_time = current_time                
+            self.pending_start = current_time           
+            self.state_before_pending = STATES.IDLE     
+            self.duratons.clear()    
 
 
     def accept_pending_state(self, new_state: STATES) -> None:
+        #print(new_state)
         '''
         new_state -> the new_state of the decoder to be set could be recording or idle (current has to pending)
         Utility function for accepting the change of state of the ldr as not noise and legitimate
@@ -160,7 +169,10 @@ class Morse_Decoder:
             # end of message revert to IDLE and process the message
             elif(self.state == STATES.RECORDING and current_time - self.last_time > SIGNAL_TIMEOUT_LIMIT):
                 self.state = STATES.IDLE
-                self.duratons.append(current_time-self.last_time)
+                if(self.last_signal_state):#ending with a dash (that is too long but what ever ...) dash should be added
+                    self.duratons.append(current_time-self.last_time)
+                else:#ending with long low signal correct ending of a message the signal need not be added
+                    pass
                 self.process_code(self.duratons)
                 self.duratons.clear()
                 return True # no issue in returning since the
@@ -190,9 +202,17 @@ class Morse_Decoder:
         '''
         Called when a morse code has been captured by get_signal
         '''
-
+        #print(timing_data)
         encoding = self.convert_timing_to_code(timing_data)
-        self.call_back(str(encoding))
+        #print(encoding)
+        encoded_string = "".join(str(code.value) for code in encoding)
+        try:
+            message = convert_to_english(encoded_string)
+        except KeyError:
+            message = ''
+        self.call_back(message)
+
+        
 
     def convert_timing_to_code(self, timing_data: List[float]) -> List[MORSE_ENCODING]:
         '''
