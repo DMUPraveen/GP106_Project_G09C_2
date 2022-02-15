@@ -11,15 +11,20 @@ iterator = util.Iterator(board)
 iterator.start()
 
 #Assigning variables for the conncted pins
-V = board.get_pin('a:1:i')
+V = board.get_pin('a:0:i')
 B = board.get_pin('d:9:p')
 R1 = 1100 #fixed resistor value
 
+#Steinhart constants
+c1 = 1.009249522e-3
+c2 = 2.378405444e-4
+c3 = 2.019202697e-7
+
 while True:
     time.sleep(0.1)
-    v = (V.read())*1023
-    R2 =R1*(1023/(v)-1) #Resistance of the thermistor
-    #Steinhart equation to give temeperature read from the thermistor 
+    v = (V.read())
+    R2 =R1*(1.038/(v)-1) #Resistance of the thermistor
+    #Steinhart equation to give temeperature read from the thermistor
     T =  (1/(c1+c2*math.log(R2*10)+c3*math.log(R2*10)*math.log(R2*10)*math.log(R2*10)))-273
     print(T,'celcius')
 
@@ -32,8 +37,3 @@ while True:
         B.write(0.8)
         board.pass_time(0.5)
         B.write(0)
-        
-        
-
-
-
