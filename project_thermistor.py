@@ -5,7 +5,7 @@ import time
 import math
 
 #connecting to the arduino
-board = Arduino('COM5')
+board = Arduino('COM4')
 
 #Iterator
 iterator = util.Iterator(board)
