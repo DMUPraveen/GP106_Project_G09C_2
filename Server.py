@@ -59,7 +59,7 @@ except:
 
 
 def Mos(message):
-    if message=="e":
+    if message=="hello":
         client.publish(topic_8,"Access_Granted")
         print("Access Granted")
     else:
