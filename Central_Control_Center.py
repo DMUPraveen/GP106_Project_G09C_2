@@ -1,5 +1,4 @@
-import json
-from pydoc import cli
+
 import paho.mqtt.client as mqtt
 from pyfirmata import Arduino
 from morse.Morse_Decoder import Morse_Decoder
