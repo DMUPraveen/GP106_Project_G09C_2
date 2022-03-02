@@ -18,6 +18,8 @@ THERMISTOR_PIN ="a:0:i"
 THERMISTOR_RESISTOR = 1000
 COM_PORT = "COM4"
 MAX_TEMP = 30
+LDR_THRESHOLD = 0.5 #As of now the threshold must be manually adjusted via the potentiometer
+#We are working on methods to calibrate this automatically depending on the lighting condition
 ##############################################
 
 
@@ -159,7 +161,7 @@ def main():
         if(ldr is None):
             pass
         else:
-            md.get_signal(ldr>0.3,time.time())
+            md.get_signal(ldr>LDR_THRESHOLD,time.time())
             #print(md.state)
         hardware.update(time.time())
 
