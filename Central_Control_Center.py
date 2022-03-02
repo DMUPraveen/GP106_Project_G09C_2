@@ -14,6 +14,7 @@ LED_RED = "d:10:o"
 LED_GREEN = "d:11:o"
 BUZZER_PIN ="d:9:p"
 THERMISTOR_PIN ="a:0:i"
+BUTTON_PIN = 'd:9:i'
 THERMISTOR_RESISTOR = 1000
 COM_PORT = "COM4"
 MAX_TEMP = 30
@@ -78,6 +79,9 @@ class MQTT_Handler(mqtt.Client):
 
 
 class Hardware:
+    '''
+    Wrapper around the pyfirmata Arduino Class to ease readability of the code
+    '''
     def __init__(self,com_port:str,time:float,report_delay:float,mqtt_handler:MQTT_Handler):
         self.board = Arduino(com_port)
         self.ldr_pin = self.board.get_pin(LDR_PIN)
@@ -85,16 +89,26 @@ class Hardware:
         self.gree_pin = self.board.get_pin(LED_GREEN)
         self.thermistor = self.board.get_pin(THERMISTOR_PIN)
         self.buzzer = self.board.get_pin(BUZZER_PIN)
+        self.button = self.board.get_pin(BUTTON_PIN)
         self.time = time
         self.report_delay = report_delay
         self.mqtt_handler:MQTT_Handler = mqtt_handler
+        self.locked = True
+        self.lock()
     def wait_while_input_stable(self):
+        '''
+        Wait while the inputs stabilize
+        '''
         while True:
             for pin in [self.ldr_pin,self.thermistor]:
                 if(pin.read() is None):
                     continue
             break
     def update(self,time):
+        '''
+        Updating the board (calling board.itierate())
+        And doing the reporting if the correct time has elapsed
+        '''
         self.board.iterate()
         if((time - self.time) > self.report_delay):
             self.time = time
@@ -114,55 +128,82 @@ class Hardware:
         self.buzzer.write(1.0)
     def buzzer_off(self):
         self.buzzer.write(0) 
+    def button_pressed(self):
+        return self.button.read()
     def get_temp(self)->Optional[float]:
         try:
             return Thermistor_Lib.V_to_T(self.thermistor.read(),THERMISTOR_RESISTOR)
         except:
             return None
     def report(self):
+        '''
+        Send the relevant data to the MQTT broker
+        '''
         temp = self.get_temp()
         #print("reporting")
         if(temp is not None):
             self.mqtt_handler.publish(THERMISTOR_TOPIC,temp)
         else:
             self.mqtt_handler.publish(SYS_ERR)
+    def lock(self):
+        self.locked = True
+        self.red_on()
+        self.green_off
+    def unlock(self):
+        self.locked = True
+        self.green_on()
+        self.red_off()
+
 
 
 
 def main():
+    #Instantiatin hardware and the MQTT client
     mqtt_handler = MQTT_Handler(MQTT_NAME,MQTT_SERVER,MQTT_PORT)
     hardware = Hardware(COM_PORT,time.time(),1,mqtt_handler)
+    #It takes a while for the systme to settle down wait while this happens
     hardware.wait_while_input_stable()
-    print("done")
+    print("done -- systme up and running")
+
+    ############## Defining Call backs used by various porcesses in the code #####################
     def call_back(code:str):
         print(code)
         mqtt_handler.publish(MORSE_SEND,code)
     def access_granted(data):
         print("Acess granted")
+        hardware.unlock()
     def access_denied(data):
         print("Acess denied")
     
+    ############### Adding events to be observed by the mqtt handler and the corresponding action###############
     mqtt_handler.observe_event(MORSE_GET_GRANTED,access_granted)
     mqtt_handler.observe_event(MORSE_GET_DENIED,access_denied)
     mqtt_handler.observe_event(ALARM,lambda temp : hardware.buzzer_on())
+    #################################################################################################
     md = Morse_Decoder(call_back,time.time())
     while True:
         #hardware.buzzer_on()
         temp = hardware.get_temp()
         #print(temp)
+        #################################Checking for the temperature value###################
         if(temp is None):
             pass
         elif(temp > MAX_TEMP):
             hardware.buzzer_on()
         else:
             hardware.buzzer_off()
+        ######################################################################################
+
+        if(hardware.button_pressed): #If the lock button is pressed lock the system
+            hardware.lock()
         ldr = hardware.get_ldr()
         if(ldr is None):
             pass
         else:
-            md.get_signal(ldr>LDR_THRESHOLD,time.time())
+            md.get_signal(ldr>LDR_THRESHOLD,time.time()) #Capturing signal from morse code
             #print(md.state)
-        hardware.update(time.time())
+        hardware.update(time.time()) #updating the hardware important functions are called in this function
+                                    #Functions that need to be run every loop
 
 
         
