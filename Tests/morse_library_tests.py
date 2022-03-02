@@ -1,11 +1,13 @@
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #so that morse can be found
+
 from morse.Morse_Decoder import Morse_Decoder
 from morse.MorseCode_translator import convertToMorse
 from morse.testing_utilities import Debug_Timer,Automatic_Morse,MORSE_ENCODING
 
 
-import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 
 # def convert_to_morse(message:str)->str:

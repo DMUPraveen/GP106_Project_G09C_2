@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #so that morse can be found
 
 from pyfirmata import Arduino,util,OUTPUT,INPUT
 from morse.Morse_Decoder import Morse_Decoder,MORSE_ENCODING
