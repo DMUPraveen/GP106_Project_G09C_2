@@ -1,0 +1,7 @@
+LDR_PIN = "a:1:i"
+LED_RED = "d:10:o"
+LED_GREEN = "d:11:o"
+BUZZER_PIN = "d:9:p"
+THERMISTOR_PIN = "a:0:i"
+BUTTON_PIN = 'd:12:i'
+THERMISTOR_RESISTOR = 1000

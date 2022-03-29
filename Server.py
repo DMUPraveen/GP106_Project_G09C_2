@@ -53,10 +53,10 @@ try:
     client.on_message = on_message
     client.on_disconnect=on_disconnect
     client.loop_start()
-except:
+
+except Exception:
     print("Connection to MQTT broker failed!")
     exit(1)
-
 
 def Mos(message):
     if message=="hello":
@@ -67,3 +67,5 @@ def Mos(message):
         print("Access Denied")
 #client.publish(topic_12,"Fire")
 
+while True:
+    time.sleep(0.1)
