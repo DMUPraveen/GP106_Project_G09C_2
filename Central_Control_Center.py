@@ -53,7 +53,8 @@ class System:
         self.initialize_hardware()
         self.intialize_event_managers()
 
-        self.system_unlock()
+        self.system_lock()
+        self.mqtt_handler.publish(tp.CCC.STATUS,tp.CCC.SECURE)
 
     def initialize_mqtt_handler(self):
         ############ MQTT Call Backs ###################
@@ -110,7 +111,7 @@ class System:
 
         self.locked = True
         self.hardware.lock()
-        self.mqtt_handler.publish(tp.CCC.STATUS, "LOCKED")
+        self.mqtt_handler.publish(tp.CCC.STATUS, tp.CCC.LOCKED)
 
     def system_unlock(self):
         if(not self.locked):
@@ -118,7 +119,7 @@ class System:
 
         self.locked = False
         self.hardware.unlock()
-        self.mqtt_handler.publish(tp.CCC.STATUS, "UNLOCKED")
+        self.mqtt_handler.publish(tp.CCC.STATUS, tp.CCC.UNLOCKED)
 
     def is_fire(self, temp):
         return (temp is not None and temp > MAX_TEMP)
@@ -136,86 +137,12 @@ class System:
                 self.morse_decoder.get_signal(ldr > LDR_THRESHOLD, time.time())
 
             if(self.hardware.button_pressed()):
-                self.system_lock()
+                self.system_unlock()
                 self.buzzer_switch.master_off()
             self.hardware.update()
 
 
-def main():
-    # Instantiating main objects that handle hardware,network,resources and events
-    mqtt_handler = MQTT_Handler(MQTT_NAME, MQTT_SERVER, MQTT_PORT)
-    hardware = Hardware(COM_PORT)
-    timed_events = TimedEventManager()
-    event_manager = Event_Manager()
-    buzzer_switch = Multi_Or_Switch(
-        hardware.buzzer_on,
-        hardware.buzzer_off
-    )
-
-    fire_alarm = buzzer_switch.get_handle()
-    network_alarm = buzzer_switch.get_handle()
-    ############## Defining Call backs used by various porcesses in the code #####################
-
-    def morse_call_back(code: str):
-        print(code)
-        mqtt_handler.publish(tp.CCC.MORSE_SEND, code)
-
-    def parse_acess_message(data):
-        if(data == tp.CCC.ACESS_GRANTED):
-            print("Acess granted")
-            hardware.unlock()
-        else:
-            print("Acess denied")
-            hardware.lock()
-
-    def raise_alarm(data):
-        network_alarm.request_on()
-
-    def publish_temperature_data():
-        mqtt_handler.publish(tp.CCC.TEMPERATURE, f'{hardware.get_temp():.1f}')
-        # print("publishsing")
-    ############### Managing Events###############
-    # Mqtt event
-    mqtt_handler.observe_event(tp.CCC.MORSE_ACCESS, parse_acess_message)
-    mqtt_handler.observe_event(tp.CCC.RAISE_ALARM, raise_alarm)
-
-    # other events
-    timed_events.add_event(TEMP_REPORT_DELAY, publish_temperature_data)
-    #################################################################################################
-
-    md = Morse_Decoder(morse_call_back, time.time())
-    hardware.wait_while_input_stable()
-    print("Systme up and running")
-    hardware.unlock()
-    while True:
-        # hardware.buzzer_on()
-        temp = hardware.get_temp()
-        timed_events.run()
-        #################################Checking for the temperature value###################
-        if(temp is None):
-            pass
-        elif(temp > MAX_TEMP):
-            fire_alarm.request_on()
-        else:
-            fire_alarm.request_off()
-        ######################################################################################
-
-        if(hardware.button_pressed()):
-            # print("pressed")  # If the lock button is pressed lock the system
-            hardware.lock()
-        ldr = hardware.get_ldr()
-        if(ldr is None):
-            pass
-        else:
-            # Capturing signal from morse code
-            md.get_signal(ldr > LDR_THRESHOLD, time.time())
-            # print(md.state)
-        # updating the hardware important functions are called in this function
-        hardware.update()
-        # Functions that need to be run every loop
-
 
 if __name__ == "__main__":
-    #main()
     system = System(MQTT_NAME,MQTT_PORT,MQTT_SERVER,COM_PORT)
     system.main_loop()
