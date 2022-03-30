@@ -34,5 +34,5 @@ class MQTT_Handler(mqtt.Client):
             for func in self.events[topic]:
                 func(message)
     def on_disconnect(self, userdata, flags, rc):
-        print("Connected with result code "+str(rc))
+        print("Disconnected with result code "+str(rc))
     
