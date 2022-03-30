@@ -73,7 +73,7 @@ def main():
 
     def publish_temperature_data():
         mqtt_handler.publish(THERMISTOR_TOPIC, hardware.get_temp())
-        print("publishsing")
+        #print("publishsing")
     ############### Managing Events###############
     #Mqtt event
     mqtt_handler.observe_event(MORSE_GET_GRANTED, access_granted)
@@ -87,6 +87,7 @@ def main():
     md = Morse_Decoder(morse_call_back, time.time())
     hardware.wait_while_input_stable()
     print("Systme up and running")
+    hardware.unlock()
     while True:
         # hardware.buzzer_on()
         temp = hardware.get_temp()
@@ -101,7 +102,7 @@ def main():
         ######################################################################################
 
         if(hardware.button_pressed()):
-            print("pressed")  # If the lock button is pressed lock the system
+            #print("pressed")  # If the lock button is pressed lock the system
             hardware.lock()
         ldr = hardware.get_ldr()
         if(ldr is None):

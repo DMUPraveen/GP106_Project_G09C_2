@@ -79,7 +79,7 @@ class Hardware:
     def lock(self):
         self.locked = True
         self.red_on()
-        self.green_off
+        self.green_off()
 
     def unlock(self):
         self.locked = True
