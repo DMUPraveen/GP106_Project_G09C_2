@@ -1,23 +1,23 @@
 # Imports 
 import time
 import paho.mqtt.client as mqtt
-
+import Topics as tp
 #Identify the Group
 group='G9C_CCS'
 
 #Identify the Topics
-topic_1 = "G9C/CCS/Panic"
-topic_2 = "G9C/CCS/MOs Code"
-topic_3 = "G9C/CCS/Light Intensity"
-topic_4 = "G9C/CCS/Floor Pressure"
-topic_5 = "G9C/CCS/Secret Entry"
-topic_6 = "G9C/CCS/Secret Knock"
-topic_7 = "G9C/CCS/Temperature"
-topic_8 = "G9C/CCS/MOs Code/Granted"
-topic_9 = "G9C/CCS/MOs Code/Denied"
-topic_10 = "G9C/CCC/Temperature"
-topic_11 = "G9C/CCC/MOs Code"
-topic_12 = "G9C/CCS/Alarm"
+topic_1 = tp.PO.PANIC_BUTTON# "G9/CCS/Panic"
+topic_2 = "G9/CCS/MOs Code"
+topic_3 = tp.CDR.LIGHT_INTENSITY#"G9/CDR/Light Intensity"
+topic_4 = tp.CDR.FLOOR_PRESSURE#"G9/CDR/Floor Pressure"
+topic_5 = tp.CDR.SEQ_ACCESS#"G9/CDR/Secret Entry"
+topic_6 = tp.PO.KNOCK_ACCESS#"G9/CCS/Secret Knock"
+topic_7 = tp.CCC.TEMPERATURE#"G9/CCS/Temperature"
+topic_8 = tp.CCC.MORSE_ACCESS#"G9/CCS/MOs Code/Granted"
+topic_9 = "G9/CCS/MOs Code/Denied"
+topic_10 = tp.CCC.TEMPERATURE#"G9/CCC/Temperature"
+topic_11 = tp.CCC.MORSE_SEND#"G9/CCC/MOs Code"
+topic_12 = "G9/CCS/Alarm"
 
 #Connecting to Server
 mqttBroker = "vpn.ce.pdn.ac.lk" #UOP Server
@@ -60,10 +60,10 @@ except Exception:
 
 def Mos(message):
     if message=="hello":
-        client.publish(topic_8,"Access_Granted")
+        client.publish(topic_8,tp.CCC.ACESS_GRANTED)
         print("Access Granted")
     else:
-        client.publish(topic_9,"Access_Denied")
+        client.publish(topic_8,tp.CCC.ACESS_DENIED)
         print("Access Denied")
 #client.publish(topic_12,"Fire")
 

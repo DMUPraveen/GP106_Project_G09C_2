@@ -7,7 +7,8 @@ from Hardware.hardware import Hardware
 import time
 from Utility.Event import TimedEventManager
 from Utility.Resource import Multi_Or_Switch
-GROUP_NAME = "G9C"
+import Topics as tp
+GROUP_NAME = "G9"
 UNIT_NAME = "CCC"
 CENTRAL_CONTROL_SERVER_NAME = "CCS"
 ################ Arduino Config ##############
@@ -58,27 +59,29 @@ def main():
     )
     
     fire_alarm = buzzer_switch.get_handle()
-
+    network_alarm =  buzzer_switch.get_handle()
     ############## Defining Call backs used by various porcesses in the code #####################
     def morse_call_back(code: str):
         print(code)
         mqtt_handler.publish(MORSE_SEND, code)
 
-    def access_granted(data):
-        print("Acess granted")
-        hardware.unlock()
-
-    def access_denied(data):
-        print("Acess denied")
+    def parse_acess_message(data):
+        if(data == tp.CCC.ACESS_GRANTED):
+            print("Acess granted")
+            hardware.unlock()
+        else:
+            print("Acess denied")
+            hardware.lock()
+    def raise_alarm(data):
+        network_alarm.request_on()
 
     def publish_temperature_data():
-        mqtt_handler.publish(THERMISTOR_TOPIC, hardware.get_temp())
+        mqtt_handler.publish(tp.CCC.TEMPERATURE, f'{hardware.get_temp():.1f}')
         #print("publishsing")
     ############### Managing Events###############
     #Mqtt event
-    mqtt_handler.observe_event(MORSE_GET_GRANTED, access_granted)
-    mqtt_handler.observe_event(MORSE_GET_DENIED, access_denied)
-    mqtt_handler.observe_event(ALARM, lambda temp: hardware.buzzer_on())
+    mqtt_handler.observe_event(tp.CCC.MORSE_ACCESS, parse_acess_message)
+    mqtt_handler.observe_event(ALARM, raise_alarm)
 
     #Other events
     timed_events.add_event(TEMP_REPORT_DELAY,publish_temperature_data)
