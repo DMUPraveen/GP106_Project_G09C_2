@@ -16,7 +16,7 @@ class Hardware:
     Wrapper around the pyfirmata Arduino Class to ease readability of the code
     '''
 
-    def __init__(self, com_port: str, time: float, report_delay: float):
+    def __init__(self, com_port: str, time: float):
         self.board = Arduino(com_port)
         self.ldr_pin = self.board.get_pin(LDR_PIN)
         self.red_pin = self.board.get_pin(LED_RED)

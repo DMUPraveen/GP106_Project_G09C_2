@@ -3,7 +3,7 @@ Contains utility functions and classes to handle events
 '''
 
 import time
-from typing import Callable, List
+from typing import Callable, List,Dict
 
 class TimedEvent:
     '''
@@ -45,4 +45,18 @@ class TimedEventManager:
         for te in self.timed_events:
             te.run(self.timer())
 
+
+class Event_Manager:
+    def __init__(self):
+        self.events : Dict[str,List[Callable[[],None]]] = dict()
+
+    def on_event(self,event_name:str,function: Callable[[],None]):
+        if(event_name not in self.events):
+            self.events[event_name] = []
+        self.events[event_name].append(function)
+    def create_event(self,event_name:str):
+        if(event_name in self.events):
+            for func in self.events[event_name]:
+                func()
+                
 
