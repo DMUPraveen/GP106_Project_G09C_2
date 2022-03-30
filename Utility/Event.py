@@ -54,7 +54,7 @@ class Event_Manager:
         if(event_name not in self.events):
             self.events[event_name] = []
         self.events[event_name].append(function)
-    def create_event(self,event_name:str):
+    def publish_event(self,event_name:str):
         if(event_name in self.events):
             for func in self.events[event_name]:
                 func()

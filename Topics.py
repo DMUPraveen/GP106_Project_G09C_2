@@ -23,11 +23,11 @@ class CCC:
     ALARM_ON = _ccc("ALARM_ON") # ->ccc
     RAISE_ALARM = _ccc("ALARM_RAISE") # ccc->
     LOCKDOWN = _ccc("LOCKDOWN")
-
+    STATUS = _ccc("STATUS")
     #Topic Payloads
     ACESS_GRANTED = "GRANTED"
     ACESS_DENIED = "DENIED"
-
+    LOCKED = "LOCKED"
 
 
 class CCS:

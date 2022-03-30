@@ -16,7 +16,7 @@ class Hardware:
     Wrapper around the pyfirmata Arduino Class to ease readability of the code
     '''
 
-    def __init__(self, com_port: str, time: float):
+    def __init__(self, com_port: str):
         self.board = Arduino(com_port)
         self.ldr_pin = self.board.get_pin(LDR_PIN)
         self.red_pin = self.board.get_pin(LED_RED)
@@ -24,7 +24,6 @@ class Hardware:
         self.thermistor = self.board.get_pin(THERMISTOR_PIN)
         self.buzzer = self.board.get_pin(BUZZER_PIN)
         self.button = self.board.get_pin(BUTTON_PIN)
-        self.time = time
         self.locked = True
         self.lock()
 
@@ -38,7 +37,7 @@ class Hardware:
                     continue
             break
 
-    def update(self, time):
+    def update(self):
         '''
         Updating the board (calling board.itierate())
         And doing the reporting if the correct time has elapsed
