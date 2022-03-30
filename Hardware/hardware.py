@@ -1,7 +1,7 @@
 from pyfirmata import Arduino
 from . import Thermistor_Lib
 from typing import Optional
-from hardware_config import *
+from .hardware_config import *
 '''
 Class for handling the hardware configuration
 '''
@@ -61,7 +61,7 @@ class Hardware:
         return self.ldr_pin.read()
 
     def buzzer_on(self):
-        print("hello")
+        #print("hello")
         self.buzzer.write(1.0)
 
     def buzzer_off(self):

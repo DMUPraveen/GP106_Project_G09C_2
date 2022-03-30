@@ -39,7 +39,7 @@ ALARM = topic_server_wraps("Alarm")
 ##############################################
 
 COM_PORT = "COM4"
-MAX_TEMP = 30
+MAX_TEMP = 36
 LDR_THRESHOLD = 0.5
 ####################################################
 TEMP_REPORT_DELAY = 1  # The temperature is sent to the server every second so as not to
@@ -73,6 +73,7 @@ def main():
 
     def publish_temperature_data():
         mqtt_handler.publish(THERMISTOR_TOPIC, hardware.get_temp())
+        print("publishsing")
     ############### Managing Events###############
     #Mqtt event
     mqtt_handler.observe_event(MORSE_GET_GRANTED, access_granted)
@@ -84,10 +85,12 @@ def main():
     #################################################################################################
     
     md = Morse_Decoder(morse_call_back, time.time())
+    hardware.wait_while_input_stable()
+    print("Systme up and running")
     while True:
         # hardware.buzzer_on()
         temp = hardware.get_temp()
-        # print(temp)
+        timed_events.run()
         #################################Checking for the temperature value###################
         if(temp is None):
             pass
@@ -97,7 +100,8 @@ def main():
             fire_alarm.request_off()
         ######################################################################################
 
-        if(hardware.button_pressed):  # If the lock button is pressed lock the system
+        if(hardware.button_pressed()):
+            print("pressed")  # If the lock button is pressed lock the system
             hardware.lock()
         ldr = hardware.get_ldr()
         if(ldr is None):

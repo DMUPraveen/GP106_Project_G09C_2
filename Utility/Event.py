@@ -17,9 +17,10 @@ class TimedEvent:
         '''
         runs the function if the set time has elapsed
         '''
+        #print(current_time,self.previous_time,self.delay)
         if(current_time - self.previous_time > self.delay):
             self.function()
-        self.previous_time = current_time
+            self.previous_time = current_time
     def reset(self,current_time:float):
         self.previous_time = current_time
 
