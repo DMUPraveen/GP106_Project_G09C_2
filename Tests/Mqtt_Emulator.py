@@ -9,6 +9,7 @@ from Utility.Event import TimedEventManager
 from Network.mqtt import MQTT_Handler
 from random import random
 import Topics as tp
+from time import sleep
 MQTT_NAME = "G9C_EM"
 MQTT_SERVER = "vpn.ce.pdn.ac.lk"
 MQTT_PORT = 8883
@@ -41,6 +42,7 @@ def main():
     mqtt_handler.observe_event(tp.CDR.LOCKDOWN,print_message_and_payload('CDR'))
     while True:
         timed_events.run()
+        sleep(0.1)
 
 
 if __name__ == "__main__":
