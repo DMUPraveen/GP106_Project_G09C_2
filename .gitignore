@@ -1,3 +1,4 @@
 #removing code editor configuration files
 .vscode/
 **/__pycache__/
+venv/
