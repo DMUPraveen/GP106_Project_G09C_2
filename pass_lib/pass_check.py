@@ -20,7 +20,13 @@ class Password_Respones(NamedTuple):
 class Password_Manager:
     def __init__(self,dict:Dict[str,Any]):
         self.passwords = dict
-                
+
+    def get_password(self,user):
+        if(user not in self.passwords):
+            return Password_Respones(False)
+        else:
+            return Password_Respones(True,self.passwords[user])  
+                    
     def check_password_hash(self,user:str,password:str)->Password_Respones:
         if(user not in self.passwords):
             return Password_Respones(False)
