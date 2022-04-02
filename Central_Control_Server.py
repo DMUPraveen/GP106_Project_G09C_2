@@ -5,6 +5,8 @@ import Topics as tp
 from pass_lib.pass_check import Password_Manager
 from Utility.Event import Event_Manager
 from time import sleep
+from teams_password_chekers import CDR_sequence_checker
+from typing import Callable
 
 MQTT_NAME = "G9C_CCS"
 MQTT_SERVER = "vpn.ce.pdn.ac.lk"
@@ -29,7 +31,7 @@ class Central_Control_Server:
             return
         self.mqtt_handler = MQTT_Handler(MQTT_NAME,MQTT_SERVER,MQTT_PORT)
         self.event_manager = Event_Manager()
-
+        self.cdr_sequence_checker = CDR_sequence_checker()
         self.initialize_event_manager()
         self.initialize_mqtt_handler()
     
@@ -46,9 +48,30 @@ class Central_Control_Server:
     def initialize_event_manager(self):
         self.event_manager.on_event(SECURITY_BREACH_EVENT,lambda : print("Security Breach"))
     
+    def send_to_mqtt_decorator(self,topic:str,function:Callable[[str],str])->Callable[[str],None]:
+        '''
+        This is a utility function that takes in a function that takes in a
+        string and returns a new function that instead of returning the said string
+        publishes to the mqtt_server under the topic topic 
+
+        This is used to convert password checker functions provided by other teams
+        which take in a str as the pass code and returns the correct access code (denied,accepted etc),
+        into functions that does the same but publishes the result instead
+
+        topic: The topic to which the returning function will publish to
+        function: function to be decorated
+        '''
+        def publishing_function(payload):
+            self.mqtt_handler.publish(topic,function(payload))
+        
+        return publishing_function
+
     def initialize_mqtt_handler(self):
         self.mqtt_handler.observe_event(tp.CCC.MORSE_SEND,self.validate_and_send_morse)
-
+        self.mqtt_handler.observe_event(
+            tp.CDR.SEQ_SEND,
+            self.send_to_mqtt_decorator(tp.CDR.SEQ_ACCESS,self.cdr_sequence_checker.check)
+            )
     def loop(self):
         while True:
             sleep(0.1)

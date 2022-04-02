@@ -1,13 +1,19 @@
 
 import hashlib
-import json
-import logging
-from tarfile import ENCODING
+import sqlite3
 from typing import Dict,Any,NamedTuple, Optional
 
 STRING_ENCODING = 'utf-8'
 
 
+
+class Sql_manager:
+    '''
+    Warpper around sqlite library for storing passwaords
+    '''
+    def __init__(self,password_database:str):
+        cursor = sqlite3.connect(password_database)
+        
 
 
 def hash_string(string:str):
