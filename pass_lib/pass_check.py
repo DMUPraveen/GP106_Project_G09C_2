@@ -1,6 +1,6 @@
 
 import hashlib
-import sqlite3
+import json
 from typing import Dict,Any,NamedTuple, Optional
 
 STRING_ENCODING = 'utf-8'
@@ -9,15 +9,15 @@ STRING_ENCODING = 'utf-8'
 
 
 def hash_string(string:str):
-    return hashlib.md5(bytes(string,'utf-8')).digest()
+    return hashlib.md5(bytes(string,'utf-8')).hexdigest()
 
 class Password_Respones(NamedTuple):
     exists : bool
     valid : Optional[bool] = None
 
 class Password_Manager:
-    def __init__(self,dict:Dict[str,Any]):
-        self.passwords = dict
+    def __init__(self,file_name:str):
+        self.passwords = json.load(open(file_name,"r"))
 
     def get_password(self,user):
         if(user not in self.passwords):
