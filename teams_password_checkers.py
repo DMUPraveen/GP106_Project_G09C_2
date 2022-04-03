@@ -4,7 +4,7 @@ Conatins functions for processing and validating passwords from many sub teams
 from pass_lib.pass_check import Password_Manager
 import Topics as tp
 from typing import Callable,Optional
-
+import json
 
 
 
@@ -110,3 +110,73 @@ class CDR_sequence_checker:
         self.on_fail()
         return tp.CDR.ACCESS_DENIED
         
+
+class PO_knock_checker:
+    '''
+    Code for validating the knocks sent by the PO (Provided by team B)
+    '''
+    PASS_KNOCK = [0.16655588150024414, 0.13585114479064941, 0.3684210777282715, 0.11480975151062012, 0.1613321304321289, 0.4034092426300049, 0.40139293670654297, 0.38600611686706543]
+    TOLERANCE = 0.2 #time variation to avoid human errors
+    def __init__(self,
+                on_password_err:Optional[Callable[[],None]]=None,
+                on_fail:Optional[Callable[[],None]]=None
+        ):
+        '''
+        Used to handle checking passcodes sent from the CDR.
+
+        Args:
+
+            on_password_err : This function will be called when there is an invalid password
+                                Default is None. If None nothing will be done
+            on_fail         : This function will be called when there is some other error such
+                                as a missing user etc.
+        '''
+        self.on_fail:Callable[[],None] = lambda : None
+        self.on_password_err:Callable[[],None] = lambda : None
+
+        if(on_password_err is not None):
+            self.on_password_err = on_password_err
+        if(on_fail is not None):
+            self.on_fail = on_fail
+
+
+    @classmethod
+    def compare_knocks(cls,pass_knocks):
+        if len(pass_knocks) != len(cls.PASS_KNOCK):
+            return False
+
+        for pass_k,rec_k in zip(pass_knocks,cls.PASS_KNOCK):
+            diff = abs(pass_k-rec_k)
+            if(diff > cls.TOLERANCE):
+                return False
+
+        return True
+    def check(self,str_array:str)->str:
+        '''
+        Checks whether sent knock is correct and returns the appropraite response
+        
+        Args:
+
+            array(str) : A python list containing converted to a string e.g. ['1.0,2.0,3.0,4.5,5.2']
+        
+        As the array is in string format it needs to be decoded to work with we will exploit the
+        fact that in the json format lists are implemented in the same way to convert the string to a list
+        using json.loads
+        '''
+        try:
+            float_array = json.loads(str_array)
+        
+        except json.JSONDecodeError:
+            return tp.PO.ACESS_DENIED
+
+        try:
+            if(self.compare_knocks(float_array)):
+                return tp.PO.ACESS_GRANTED
+
+            return tp.PO.ACESS_DENIED
+        except Exception:
+            return tp.PO.ACESS_DENIED
+
+        
+
+

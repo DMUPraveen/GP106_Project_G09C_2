@@ -56,6 +56,26 @@ class Random_CDR_acess():
         print(ret)
         return str(ret)
 
+class Random_PO_acess():
+    """
+    Used to send CDR sequences for testing purposes
+    """
+    def __init__(self,passwords,tolerance):
+        self.passwords = passwords
+        self.counter = 0
+        self.tolerance = tolerance
+    def __call__(self)->str:
+        print(self.counter,end=": ")
+        try:
+            ret = [i+(0.5-random())*self.tolerance for i in self.passwords[self.counter]]
+            self.counter  = (self.counter+1)%len(self.passwords)
+            print(ret)
+            return str(ret)
+        except Exception:
+            self.counter  = (self.counter+1)%len(self.passwords)
+            print(self.passwords[self.counter])
+            return str(self.passwords[self.counter])
+
 def main():
     timed_events = TimedEventManager()
     mqtt_handler = MQTT_Handler(MQTT_NAME,MQTT_SERVER,MQTT_PORT)
@@ -75,6 +95,18 @@ def main():
         ]
     )
     
+    po_acess = Random_PO_acess(
+        [
+        [0.16655588150024414, 0.13585114479064941, 0.3684210777282715, 0.11480975151062012, 0.1613321304321289, 0.4034092426300049, 0.40139293670654297, 0.38600611686706543],
+        [4,5,6,7],
+        [0.2,0.1,0.7,0.1,0,0],
+        [5,6,100,2],
+        [1,2,3,4,5,6,7,8],
+        'billy bob'
+        ],
+        0.2
+    )
+
     def publish_temp():
         mqtt_handler.publish(tp.CCC.TEMPERATURE,f'{temp_CCC.get():.1f}')
         mqtt_handler.publish(tp.PO.TEMPERATURE,f'{temp_PO.get():.1f}')
@@ -88,13 +120,15 @@ def main():
     timed_events.add_event(1,publish_temp)
     timed_events.add_event(2,lambda : mqtt_handler.publish(tp.CCC.MORSE_SEND,random_morse()))
     timed_events.add_event(3,lambda : mqtt_handler.publish(tp.CDR.SEQ_SEND,cdr_acess()))
+    timed_events.add_event(1,lambda : mqtt_handler.publish(tp.PO.KNOCK_SEND,po_acess()))
 
     mqtt_handler.observe_event(tp.CCC.LOCKDOWN,print_message_and_payload('CCC'))
     mqtt_handler.observe_event(tp.PO.LOCKDOWN,print_message_and_payload('PO'))
     mqtt_handler.observe_event(tp.CDR.LOCKDOWN,print_message_and_payload('CDR'))
 
-    mqtt_handler.observe_event(tp.CCC.MORSE_ACCESS,print_message_and_payload('CCC'))
-    mqtt_handler.observe_event(tp.CDR.SEQ_ACCESS,print_message_and_payload('CDR'))
+    #mqtt_handler.observe_event(tp.CCC.MORSE_ACCESS,print_message_and_payload('CCC'))
+    #mqtt_handler.observe_event(tp.CDR.SEQ_ACCESS,print_message_and_payload('CDR'))
+    mqtt_handler.observe_event(tp.PO.KNOCK_ACCESS,print_message_and_payload('PO'))
     while True:
         timed_events.run()
         sleep(0.1)

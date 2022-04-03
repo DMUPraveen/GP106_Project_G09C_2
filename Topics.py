@@ -51,6 +51,12 @@ class PO:
     PANIC_BUTTON = _po("PANIC_BUTTON")
     LOCKDOWN = _po("LOCKDOWN")
 
+    ###payloads
+
+    PANIC = "PANIC"
+    ACESS_GRANTED = "GRANTED"
+    ACESS_DENIED = "DENIED"
+
 class CDR:
     ###Topics
     _cdr = Topic_Wrapper('CDR')
@@ -58,8 +64,8 @@ class CDR:
     LIGHT_INTENSITY = _cdr("LIGHT_INTENSITY")
     FLOOR_PRESSURE = _cdr("FLOOR_PRESSURE")
     SYS_ERR = _cdr("SYS_ERR")
-    SEQ_SEND = _cdr("KNOCK_CODE")
-    SEQ_ACCESS = _cdr("KNOCK_ACESS")
+    SEQ_SEND = _cdr("SEQ_SEND")
+    SEQ_ACCESS = _cdr("SEQ_ACCESS")
     ALARM_ON = _cdr("ALARM_ON")
     RAISE_ALARM = _cdr("ALARM_RAISE")
     PANIC_BUTTON = _cdr("PANIC_BUTTON")
