@@ -9,6 +9,9 @@ from typing import Callable,Optional
 
 
 class CCC_pass_checker:
+    '''
+    Code for validating the password from CCC (Morse Code)
+    '''
     MORSE_CODE_USER = "MORSE_CODE"
     def __init__(self,
                 pass_man:Password_Manager,
@@ -17,10 +20,15 @@ class CCC_pass_checker:
         ):
         '''
         Used to handle checking passcodes sent from the CCC.
-        on_password_err : This function will be called when there is an invalid password
-                            Default is None. If None nothing will be done
-        on_fail         : This function will be called when there is some other error such
-                            as a missing user etc.
+        Args:
+
+            pass_man        : password manager containing the passwords
+            
+            on_password_err : This function will be called when there is an invalid password
+                                Default is None. If None nothing will be done
+            
+            on_fail         : This function will be called when there is some other error such
+                                as a missing user etc.
         '''
         self.on_fail:Callable[[],None] = lambda : None
         self.on_password_err:Callable[[],None] = lambda : None
@@ -31,6 +39,14 @@ class CCC_pass_checker:
             self.on_fail = on_fail
         
     def check(self,password:str)->str:
+        '''
+        Checks the password decoded by the CCC (morse code from flash to plaintext)
+        and sends the appropriate response if so
+        
+        Args:
+
+            password (str) : the password to be checked
+        '''
         exists,valid = self.pass_man.check_password_hash(self.MORSE_CODE_USER,password)
         if(not exists):
             self.on_fail()
@@ -45,6 +61,9 @@ class CCC_pass_checker:
 
 
 class CDR_sequence_checker:
+    '''
+    Code for validating the sequences sent by the CDR (Provided by team A)
+    '''
     TOP_SECRECT = "TOP_SECRET"
     SECRET = "SECRET"
     CONFIDENTIAL = "CONFIDENTIAL"
@@ -53,11 +72,13 @@ class CDR_sequence_checker:
                 on_fail:Optional[Callable[[],None]]=None
         ):
         '''
-        Used to handle checking passcodes sent from the CCC.
-        on_password_err : This function will be called when there is an invalid password
-                            Default is None. If None nothing will be done
-        on_fail         : This function will be called when there is some other error such
-                            as a missing user etc.
+        Used to handle checking passcodes sent from the CDR.
+        Args:
+
+            on_password_err : This function will be called when there is an invalid password
+                                Default is None. If None nothing will be done
+            on_fail         : This function will be called when there is some other error such
+                                as a missing user etc.
         '''
         self.on_fail:Callable[[],None] = lambda : None
         self.on_password_err:Callable[[],None] = lambda : None
@@ -70,7 +91,9 @@ class CDR_sequence_checker:
     def check(self,password:str)->str:
 
         '''
-        password : the sequence sent by the CDR
+        Args:
+
+            password : the sequence sent by the CDR
 
         this function will check the signal and return the appropiate response
         '''

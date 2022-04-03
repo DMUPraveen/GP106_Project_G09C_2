@@ -1,3 +1,8 @@
+'''
+Functions for getting user name and password for server and
+for providing the welcome message
+'''
+
 import time
 import paho.mqtt.client as mqtt
 import getpass
@@ -6,10 +11,6 @@ from tqdm import tqdm
 from colorama import Fore, Back, Style
 
 from pass_lib.pass_check import Password_Manager
-
-users = {
-    "Pentagon":b'(\x10\xad\xed\xa7\xc1\xf9\xc9\x1d\xe35e\xb0\xf5\xf8l'
-}
 
 
 def print_welcome_message():

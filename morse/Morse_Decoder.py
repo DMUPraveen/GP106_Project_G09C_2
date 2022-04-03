@@ -55,7 +55,7 @@ class STATES(enum.Enum):
     BLOCKED = 3     # blocks the decoder from decoding the decoder doesn't accept new incoming signals
 
 
-CONFIG_FILE = "morse_config.json"
+CONFIG_FILE = "morse_config.json" #: Configuration file path (relative to the package)
 
 class Configs():
     def __init__(self, configuration_dictionary:Dict[str,float]):
@@ -73,6 +73,9 @@ class Configs():
 
 #Getting configuration data from the configuration file
 def get_configurations(config_file)->Configs:
+    '''
+    functions used to get configurations from the config file
+    '''
     default_configurations = {
         "TIME_UNIT" : 1,
         "SIGNAL_MAINTAIN_MIN_LIMIT" : 0.1 ,
@@ -117,8 +120,12 @@ class Morse_Decoder:
         current_time: float
     ):
         '''
-        call_back -> function to be called when a morse code has been decoded
-        time -> time the decoder starts at (time of creation all times are )
+        Args:
+
+            call_back (str)->None : function to be called when a morse code has been
+                                    decoded
+            time (float)          : time the decoder starts at 
+                                    (time of creation all times are )
         '''
         # to be called when a Morse code is captured
 

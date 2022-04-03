@@ -25,6 +25,14 @@ class Multi_Or_Switch:
     has requested to be on.
     '''
     def __init__(self,on_turn_on:Callable[[],None],on_turn_off:Callable[[],None]):
+        """
+        Args:
+
+            on_turn_on ()->None     : function to be run when the switch is on
+
+            on_turn_off ()->None    : function to be run when the of turned off
+        """
+        
         self._on_turn_on:Callable[[],None] = on_turn_on
         self._on_turn_off:Callable[[],None] = on_turn_off
         self._handlers:List[Multi_Or_Switch_handle] = []
@@ -43,6 +51,10 @@ class Multi_Or_Switch:
         for handle in self._handlers:
             handle.request_off()
     def get_handle(self)->'Multi_Or_Switch_handle':
+        '''
+        returns a handle to the switch so multiple components can acess it
+        without interference
+        '''
         handle = Multi_Or_Switch_handle(self)
         self._handlers.append(handle)
         return handle
@@ -51,14 +63,25 @@ class Multi_Or_Switch:
 
 
 class Multi_Or_Switch_handle:
+    '''
+    Handle for a multi_or_switch
+    '''
     def __init__(self,parent:Multi_Or_Switch):
         self._parent:Multi_Or_Switch = parent
         self.on = False
     def request_on(self):
+        '''
+        Request the parent swithc to turn on
+        '''
         if(not self.on):
             self.on = True
             self._parent.on()
     def request_off(self):
+        '''
+        Request the parent switch to turn off
+        The parent switch will only turn off
+        if all handles are requesting the off state
+        '''
         if(self.on):
             self.on = False
             self._parent.off()

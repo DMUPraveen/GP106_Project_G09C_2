@@ -2,3 +2,4 @@
 .vscode/
 **/__pycache__/
 venv/
+generate_docs.bat

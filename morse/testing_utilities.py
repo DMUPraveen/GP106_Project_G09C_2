@@ -1,4 +1,6 @@
-
+"""
+Conatinins helper functions and classes useful for testing the code
+"""
 from typing import List, Literal
 from random import random
 import sys
@@ -7,15 +9,29 @@ import itertools
 
 
 class Debug_Timer:
+    
     def __init__(self):
+        """
+        This class is used to simulate time.time() for a simulated signal
+        without having to wait for the actual duration. (Makes for rapid testing)
+        """
         self.t:float = 0
 
     def __call__(self):
+        """
+        Making the class callable for easier use
+        """
         return self.time()
     def time(self)->float:
+        """
+        Returns the simulated time as a float
+        """
         return self.t
 
     def tick(self, delta:float):
+        """
+        Increments the time by the specified delta
+        """
         self.t += delta
 
 

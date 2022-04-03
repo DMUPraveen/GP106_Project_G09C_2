@@ -35,6 +35,19 @@ UNLOCK = "UNLOCK"
 
 class System:
     def __init__(self, name:str, server_port:int, server_address:str, com_port:str):
+        """
+        Args:
+
+            name (str)              : mqtt client name
+
+            server_port (int)       : mqtt server port
+
+            server_adress (str)     : mqtt broker adress
+            
+            com_port (str)          : arduino comport
+        """
+        
+        
         self.mqtt_handler = MQTT_Handler(name, server_address, server_port)
         self.hardware = Hardware(com_port)
         self.timed_events = TimedEventManager()
@@ -57,6 +70,9 @@ class System:
         self.mqtt_handler.publish(tp.CCC.STATUS,tp.CCC.SECURE)
 
     def initialize_mqtt_handler(self):
+        '''
+        Intializing the mqtt handler
+        '''
         ############ MQTT Call Backs ###################
         def parse_acess_message(data):
             if(data == tp.CCC.ACESS_GRANTED):
@@ -80,6 +96,9 @@ class System:
         self.mqtt_handler.observe_event(tp.CCC.LOCKDOWN,system_lockdown)
 
     def intialize_event_managers(self):
+        """
+        Initializing the event manager
+        """
         ############ Event Call Backs ###################
         def publish_temperature_data():
             self.mqtt_handler.publish(
@@ -98,6 +117,9 @@ class System:
         self.event_manager.on_event(NOFIRE,self.fire_alarm.request_off)
 
     def initialize_hardware(self):
+        '''
+        Intializing the hardware (also wating while input is stable)
+        '''
         def morse_call_back(code: str):
             print(code)
             self.mqtt_handler.publish(tp.CCC.MORSE_SEND, code)
@@ -106,6 +128,9 @@ class System:
         print("Hardware Up and Running")
 
     def system_lock(self):
+        '''
+        Lock the system
+        '''
         if(self.locked):
             return
 
@@ -114,6 +139,9 @@ class System:
         self.mqtt_handler.publish(tp.CCC.STATUS, tp.CCC.LOCKED)
 
     def system_unlock(self):
+        '''
+        Unlock the system
+        '''
         if(not self.locked):
             return
 
@@ -122,9 +150,15 @@ class System:
         self.mqtt_handler.publish(tp.CCC.STATUS, tp.CCC.UNLOCKED)
 
     def is_fire(self, temp):
+        '''
+        Check if the temperature is too high
+        '''
         return (temp is not None and temp > MAX_TEMP)
 
     def main_loop(self):
+        '''
+        The main loop of the Central Control Center
+        '''
         while True:
             self.timed_events.run()
             temp = self.hardware.get_temp()

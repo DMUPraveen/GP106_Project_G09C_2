@@ -1,4 +1,7 @@
 # International morse code
+"""
+# Dictionary Containing the conversions from letter to morse code and vice versa
+"""
 to_morse = {
     # Letters
     "a": ".-",

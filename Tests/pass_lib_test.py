@@ -1,3 +1,6 @@
+"""
+Code for testing certaing functionalities of the password manager
+"""
 import test_config
 from pass_lib.pass_check import Password_Manager,hash_string
 import unittest

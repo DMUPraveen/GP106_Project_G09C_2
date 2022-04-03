@@ -5,7 +5,7 @@ import Topics as tp
 from pass_lib.pass_check import Password_Manager
 from Utility.Event import Event_Manager
 from time import sleep
-from teams_password_chekers import CDR_sequence_checker,CCC_pass_checker
+from teams_password_checkers import CDR_sequence_checker,CCC_pass_checker
 from typing import Callable
 import sys
 import json

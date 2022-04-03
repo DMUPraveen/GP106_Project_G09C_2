@@ -72,8 +72,24 @@ def _morseToSignal_(morse):
 
 # call those
 def convertToWords(morse):
+    """
+    Converts morse code to english words
+
+    Args:
+
+        morse (str): string containing 0,1,2,3 each representing a different symbol in morse
+    """
     return _morseToEnglish_(_signalToMorse_(morse))
 
 
 def convertToMorse(words):
+    """
+    Converts plaint text to morse
+
+    Args:
+
+        words (str): any string containing characters supported
+
+    This is mainly used for testing purposes
+    """
     return _morseToSignal_(_englishToMorse_(words))

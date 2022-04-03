@@ -16,6 +16,9 @@ MQTT_SERVER = "vpn.ce.pdn.ac.lk"
 MQTT_PORT = 8883
 
 class Random_temp_generator():
+    """
+    Used to create changing temperature values for testing pruposes
+    """
     def __init__(self,initial):
         self.temp = initial
     def get(self)->float:
@@ -24,6 +27,9 @@ class Random_temp_generator():
 
 
 class Random_morse_acess():
+    """
+    Used to send morse codes to the server for testing
+    """
     def __init__(self,true_password:str,false_password:str):
         self.true_password = true_password
         self.false_password = false_password
@@ -38,6 +44,9 @@ class Random_morse_acess():
 
 
 class Random_CDR_acess():
+    """
+    Used to send CDR sequences for testing purposes
+    """
     def __init__(self,passwords:List[List[int]]):
         self.passwords = passwords
         self.counter = 0

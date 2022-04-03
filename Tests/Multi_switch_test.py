@@ -1,3 +1,6 @@
+"""
+For testing the multi switch class
+"""
 import test_config
 from Utility.Resource import Multi_Or_Switch
 import unittest
