@@ -44,8 +44,8 @@ class PO:
 
     TEMPERATURE = _po("TEMPERATURE")
     SYS_ERR = _po("SYS_ERR")
-    KNOCK_SEND = _po("KNOCK_CODE")
-    KNOCK_ACCESS = _po("KNOCK_ACESS")
+    KNOCK_SEND = _po("KNOCK_SEND")
+    KNOCK_ACCESS = _po("KNOCK_ACCESS")
     ALARM_ON = _po("ALARM_ON")
     RAISE_ALARM = _po("ALARM_RAISE")
     PANIC_BUTTON = _po("PANIC_BUTTON")
