@@ -157,7 +157,7 @@ class PO_knock_checker:
         
         Args:
 
-            array(str) : A python list containing converted to a string e.g. ['1.0,2.0,3.0,4.5,5.2']
+            array(str) : A python list containing floats converted to a string e.g. ['1.0,2.0,3.0,4.5,5.2']
         
         As the array is in string format it needs to be decoded to work with we will exploit the
         fact that in the json format lists are implemented in the same way to convert the string to a list

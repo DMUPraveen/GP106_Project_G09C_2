@@ -95,7 +95,7 @@ Central_Control_Server    </h1>
 <span class="kn">from</span> <span class="nn">pass_lib.pass_check</span> <span class="kn">import</span> <span class="n">Password_Manager</span>
 <span class="kn">from</span> <span class="nn">Utility.Event</span> <span class="kn">import</span> <span class="n">Event_Manager</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">teams_password_checkers</span> <span class="kn">import</span> <span class="n">CDR_sequence_checker</span><span class="p">,</span><span class="n">CCC_pass_checker</span>
+<span class="kn">from</span> <span class="nn">teams_password_checkers</span> <span class="kn">import</span> <span class="n">CDR_sequence_checker</span><span class="p">,</span><span class="n">CCC_pass_checker</span><span class="p">,</span><span class="n">PO_knock_checker</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -120,6 +120,7 @@ Central_Control_Server    </h1>
         <span class="c1">#Intializing password checkers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cdr_sequence_checker</span> <span class="o">=</span> <span class="n">CDR_sequence_checker</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ccc_pass_checker</span> <span class="o">=</span> <span class="n">CCC_pass_checker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pas_man</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">SECURITY_BREACH_EVENT</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">po_knock_checker</span> <span class="o">=</span> <span class="n">PO_knock_checker</span><span class="p">()</span>
         <span class="c1">########################################</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_event_manager</span><span class="p">()</span>
@@ -146,6 +147,7 @@ Central_Control_Server    </h1>
 <span class="sd">        function: function to be decorated</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">def</span> <span class="nf">publishing_function</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">function</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">publishing_function</span>
@@ -164,8 +166,13 @@ Central_Control_Server    </h1>
             <span class="n">tp</span><span class="o">.</span><span class="n">CDR</span><span class="o">.</span><span class="n">SEQ_SEND</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_to_mqtt_decorator</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CDR</span><span class="o">.</span><span class="n">SEQ_ACCESS</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cdr_sequence_checker</span><span class="o">.</span><span class="n">check</span><span class="p">)</span>
             <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">observe_event</span><span class="p">(</span>
+            <span class="n">tp</span><span class="o">.</span><span class="n">PO</span><span class="o">.</span><span class="n">KNOCK_SEND</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_to_mqtt_decorator</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">PO</span><span class="o">.</span><span class="n">KNOCK_ACCESS</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">po_knock_checker</span><span class="o">.</span><span class="n">check</span><span class="p">)</span>
+            <span class="p">)</span>
     <span class="k">def</span> <span class="nf">loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Press Enter to Exit: &quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">CCS_system</span> <span class="o">=</span> <span class="n">Central_Control_Server</span><span class="p">()</span>
@@ -199,6 +206,7 @@ Central_Control_Server    </h1>
         <span class="c1">#Intializing password checkers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cdr_sequence_checker</span> <span class="o">=</span> <span class="n">CDR_sequence_checker</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ccc_pass_checker</span> <span class="o">=</span> <span class="n">CCC_pass_checker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pas_man</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">SECURITY_BREACH_EVENT</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">po_knock_checker</span> <span class="o">=</span> <span class="n">PO_knock_checker</span><span class="p">()</span>
         <span class="c1">########################################</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_event_manager</span><span class="p">()</span>
@@ -225,6 +233,7 @@ Central_Control_Server    </h1>
 <span class="sd">        function: function to be decorated</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">def</span> <span class="nf">publishing_function</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">function</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">publishing_function</span>
@@ -243,8 +252,13 @@ Central_Control_Server    </h1>
             <span class="n">tp</span><span class="o">.</span><span class="n">CDR</span><span class="o">.</span><span class="n">SEQ_SEND</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_to_mqtt_decorator</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CDR</span><span class="o">.</span><span class="n">SEQ_ACCESS</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cdr_sequence_checker</span><span class="o">.</span><span class="n">check</span><span class="p">)</span>
             <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">observe_event</span><span class="p">(</span>
+            <span class="n">tp</span><span class="o">.</span><span class="n">PO</span><span class="o">.</span><span class="n">KNOCK_SEND</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_to_mqtt_decorator</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">PO</span><span class="o">.</span><span class="n">KNOCK_ACCESS</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">po_knock_checker</span><span class="o">.</span><span class="n">check</span><span class="p">)</span>
+            <span class="p">)</span>
     <span class="k">def</span> <span class="nf">loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Press Enter to Exit: &quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -271,6 +285,7 @@ Central_Control_Server    </h1>
         <span class="c1">#Intializing password checkers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cdr_sequence_checker</span> <span class="o">=</span> <span class="n">CDR_sequence_checker</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ccc_pass_checker</span> <span class="o">=</span> <span class="n">CCC_pass_checker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pas_man</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">SECURITY_BREACH_EVENT</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">po_knock_checker</span> <span class="o">=</span> <span class="n">PO_knock_checker</span><span class="p">()</span>
         <span class="c1">########################################</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_event_manager</span><span class="p">()</span>
@@ -334,6 +349,7 @@ Central_Control_Server    </h1>
 <span class="sd">        function: function to be decorated</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">def</span> <span class="nf">publishing_function</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">function</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">publishing_function</span>
@@ -379,6 +395,10 @@ function: function to be decorated</p>
             <span class="n">tp</span><span class="o">.</span><span class="n">CDR</span><span class="o">.</span><span class="n">SEQ_SEND</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_to_mqtt_decorator</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CDR</span><span class="o">.</span><span class="n">SEQ_ACCESS</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cdr_sequence_checker</span><span class="o">.</span><span class="n">check</span><span class="p">)</span>
             <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">observe_event</span><span class="p">(</span>
+            <span class="n">tp</span><span class="o">.</span><span class="n">PO</span><span class="o">.</span><span class="n">KNOCK_SEND</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_to_mqtt_decorator</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">PO</span><span class="o">.</span><span class="n">KNOCK_ACCESS</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">po_knock_checker</span><span class="o">.</span><span class="n">check</span><span class="p">)</span>
+            <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -401,7 +421,8 @@ function: function to be decorated</p>
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Press Enter to Exit: &quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 
         </details>

@@ -151,6 +151,15 @@
                         <li>
                                 <a class="variable" href="#PO.LOCKDOWN">LOCKDOWN</a>
                         </li>
+                        <li>
+                                <a class="variable" href="#PO.PANIC">PANIC</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#PO.ACESS_GRANTED">ACESS_GRANTED</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#PO.ACESS_DENIED">ACESS_DENIED</a>
+                        </li>
                 </ul>
 
             </li>
@@ -272,12 +281,18 @@ Topics    </h1>
 
     <span class="n">TEMPERATURE</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;TEMPERATURE&quot;</span><span class="p">)</span>
     <span class="n">SYS_ERR</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;SYS_ERR&quot;</span><span class="p">)</span>
-    <span class="n">KNOCK_SEND</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;KNOCK_CODE&quot;</span><span class="p">)</span>
-    <span class="n">KNOCK_ACCESS</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;KNOCK_ACESS&quot;</span><span class="p">)</span>
+    <span class="n">KNOCK_SEND</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;KNOCK_SEND&quot;</span><span class="p">)</span>
+    <span class="n">KNOCK_ACCESS</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;KNOCK_ACCESS&quot;</span><span class="p">)</span>
     <span class="n">ALARM_ON</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;ALARM_ON&quot;</span><span class="p">)</span>
     <span class="n">RAISE_ALARM</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;ALARM_RAISE&quot;</span><span class="p">)</span>
     <span class="n">PANIC_BUTTON</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;PANIC_BUTTON&quot;</span><span class="p">)</span>
     <span class="n">LOCKDOWN</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;LOCKDOWN&quot;</span><span class="p">)</span>
+
+    <span class="c1">###payloads</span>
+
+    <span class="n">PANIC</span> <span class="o">=</span> <span class="s2">&quot;PANIC&quot;</span>
+    <span class="n">ACESS_GRANTED</span> <span class="o">=</span> <span class="s2">&quot;GRANTED&quot;</span>
+    <span class="n">ACESS_DENIED</span> <span class="o">=</span> <span class="s2">&quot;DENIED&quot;</span>
 
 <span class="k">class</span> <span class="nc">CDR</span><span class="p">:</span>
     <span class="c1">###Topics</span>
@@ -286,8 +301,8 @@ Topics    </h1>
     <span class="n">LIGHT_INTENSITY</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;LIGHT_INTENSITY&quot;</span><span class="p">)</span>
     <span class="n">FLOOR_PRESSURE</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;FLOOR_PRESSURE&quot;</span><span class="p">)</span>
     <span class="n">SYS_ERR</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;SYS_ERR&quot;</span><span class="p">)</span>
-    <span class="n">SEQ_SEND</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;KNOCK_CODE&quot;</span><span class="p">)</span>
-    <span class="n">SEQ_ACCESS</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;KNOCK_ACESS&quot;</span><span class="p">)</span>
+    <span class="n">SEQ_SEND</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;SEQ_SEND&quot;</span><span class="p">)</span>
+    <span class="n">SEQ_ACCESS</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;SEQ_ACCESS&quot;</span><span class="p">)</span>
     <span class="n">ALARM_ON</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;ALARM_ON&quot;</span><span class="p">)</span>
     <span class="n">RAISE_ALARM</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;ALARM_RAISE&quot;</span><span class="p">)</span>
     <span class="n">PANIC_BUTTON</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;PANIC_BUTTON&quot;</span><span class="p">)</span>
@@ -602,12 +617,18 @@ Topics    </h1>
 
     <span class="n">TEMPERATURE</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;TEMPERATURE&quot;</span><span class="p">)</span>
     <span class="n">SYS_ERR</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;SYS_ERR&quot;</span><span class="p">)</span>
-    <span class="n">KNOCK_SEND</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;KNOCK_CODE&quot;</span><span class="p">)</span>
-    <span class="n">KNOCK_ACCESS</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;KNOCK_ACESS&quot;</span><span class="p">)</span>
+    <span class="n">KNOCK_SEND</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;KNOCK_SEND&quot;</span><span class="p">)</span>
+    <span class="n">KNOCK_ACCESS</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;KNOCK_ACCESS&quot;</span><span class="p">)</span>
     <span class="n">ALARM_ON</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;ALARM_ON&quot;</span><span class="p">)</span>
     <span class="n">RAISE_ALARM</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;ALARM_RAISE&quot;</span><span class="p">)</span>
     <span class="n">PANIC_BUTTON</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;PANIC_BUTTON&quot;</span><span class="p">)</span>
     <span class="n">LOCKDOWN</span> <span class="o">=</span> <span class="n">_po</span><span class="p">(</span><span class="s2">&quot;LOCKDOWN&quot;</span><span class="p">)</span>
+
+    <span class="c1">###payloads</span>
+
+    <span class="n">PANIC</span> <span class="o">=</span> <span class="s2">&quot;PANIC&quot;</span>
+    <span class="n">ACESS_GRANTED</span> <span class="o">=</span> <span class="s2">&quot;GRANTED&quot;</span>
+    <span class="n">ACESS_DENIED</span> <span class="o">=</span> <span class="s2">&quot;DENIED&quot;</span>
 </pre></div>
 
         </details>
@@ -648,7 +669,7 @@ Topics    </h1>
                             <div id="PO.KNOCK_SEND" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#PO.KNOCK_SEND">#&nbsp;&nbsp</a>
 
-        <span class="name">KNOCK_SEND</span><span class="default_value"> = &#39;G9/PO/KNOCK_CODE&#39;</span>
+        <span class="name">KNOCK_SEND</span><span class="default_value"> = &#39;G9/PO/KNOCK_SEND&#39;</span>
     </div>
 
     
@@ -658,7 +679,7 @@ Topics    </h1>
                             <div id="PO.KNOCK_ACCESS" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#PO.KNOCK_ACCESS">#&nbsp;&nbsp</a>
 
-        <span class="name">KNOCK_ACCESS</span><span class="default_value"> = &#39;G9/PO/KNOCK_ACESS&#39;</span>
+        <span class="name">KNOCK_ACCESS</span><span class="default_value"> = &#39;G9/PO/KNOCK_ACCESS&#39;</span>
     </div>
 
     
@@ -705,6 +726,36 @@ Topics    </h1>
     
 
                             </div>
+                            <div id="PO.PANIC" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#PO.PANIC">#&nbsp;&nbsp</a>
+
+        <span class="name">PANIC</span><span class="default_value"> = &#39;PANIC&#39;</span>
+    </div>
+
+    
+    
+
+                            </div>
+                            <div id="PO.ACESS_GRANTED" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#PO.ACESS_GRANTED">#&nbsp;&nbsp</a>
+
+        <span class="name">ACESS_GRANTED</span><span class="default_value"> = &#39;GRANTED&#39;</span>
+    </div>
+
+    
+    
+
+                            </div>
+                            <div id="PO.ACESS_DENIED" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#PO.ACESS_DENIED">#&nbsp;&nbsp</a>
+
+        <span class="name">ACESS_DENIED</span><span class="default_value"> = &#39;DENIED&#39;</span>
+    </div>
+
+    
+    
+
+                            </div>
                 </section>
                 <section id="CDR">
                                 <div class="attr class">
@@ -724,8 +775,8 @@ Topics    </h1>
     <span class="n">LIGHT_INTENSITY</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;LIGHT_INTENSITY&quot;</span><span class="p">)</span>
     <span class="n">FLOOR_PRESSURE</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;FLOOR_PRESSURE&quot;</span><span class="p">)</span>
     <span class="n">SYS_ERR</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;SYS_ERR&quot;</span><span class="p">)</span>
-    <span class="n">SEQ_SEND</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;KNOCK_CODE&quot;</span><span class="p">)</span>
-    <span class="n">SEQ_ACCESS</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;KNOCK_ACESS&quot;</span><span class="p">)</span>
+    <span class="n">SEQ_SEND</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;SEQ_SEND&quot;</span><span class="p">)</span>
+    <span class="n">SEQ_ACCESS</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;SEQ_ACCESS&quot;</span><span class="p">)</span>
     <span class="n">ALARM_ON</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;ALARM_ON&quot;</span><span class="p">)</span>
     <span class="n">RAISE_ALARM</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;ALARM_RAISE&quot;</span><span class="p">)</span>
     <span class="n">PANIC_BUTTON</span> <span class="o">=</span> <span class="n">_cdr</span><span class="p">(</span><span class="s2">&quot;PANIC_BUTTON&quot;</span><span class="p">)</span>
@@ -796,7 +847,7 @@ Topics    </h1>
                             <div id="CDR.SEQ_SEND" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#CDR.SEQ_SEND">#&nbsp;&nbsp</a>
 
-        <span class="name">SEQ_SEND</span><span class="default_value"> = &#39;G9/CDR/KNOCK_CODE&#39;</span>
+        <span class="name">SEQ_SEND</span><span class="default_value"> = &#39;G9/CDR/SEQ_SEND&#39;</span>
     </div>
 
     
@@ -806,7 +857,7 @@ Topics    </h1>
                             <div id="CDR.SEQ_ACCESS" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#CDR.SEQ_ACCESS">#&nbsp;&nbsp</a>
 
-        <span class="name">SEQ_ACCESS</span><span class="default_value"> = &#39;G9/CDR/KNOCK_ACESS&#39;</span>
+        <span class="name">SEQ_ACCESS</span><span class="default_value"> = &#39;G9/CDR/SEQ_ACCESS&#39;</span>
     </div>
 
     
