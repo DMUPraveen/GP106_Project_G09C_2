@@ -8,6 +8,7 @@ from time import sleep
 from teams_password_chekers import CDR_sequence_checker,CCC_pass_checker
 from typing import Callable
 import sys
+import json
 
 MQTT_NAME = "G9C_CCS"
 MQTT_SERVER = "vpn.ce.pdn.ac.lk"
@@ -19,7 +20,7 @@ SECURITY_BREACH_EVENT = "SECURITY_BREACH"
 class Central_Control_Server:
     
     def __init__(self):
-        self.pas_man = Password_Manager(PASSWORD_FILE)
+        self.pas_man = Password_Manager.password_manager_from_file(PASSWORD_FILE)
         print_welcome_message()
         if(not validate_user(self.pas_man)):
             sys.exit()
