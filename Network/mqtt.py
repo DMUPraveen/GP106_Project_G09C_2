@@ -79,6 +79,11 @@ class MQTT_Handler(mqtt.Client):
         Runs on connect
         """
         logging.info("Connected with result code "+str(rc))
+        for topic in self.events:
+            '''
+            Subscribing to the topics again upon reconnect
+            '''
+            self.subscribe(topic)
 
     def on_message(self,client,userdata,msg):
         """
