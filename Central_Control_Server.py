@@ -9,6 +9,7 @@ from teams_password_checkers import CDR_sequence_checker,CCC_pass_checker,PO_kno
 from typing import Callable
 import sys
 import json
+import logging
 
 MQTT_NAME = "G9C_CCS"
 MQTT_SERVER = "vpn.ce.pdn.ac.lk"
@@ -16,6 +17,7 @@ MQTT_PORT = 8883
 PASSWORD_FILE = "Passwords.json"
 SECURITY_BREACH_EVENT = "SECURITY_BREACH"
 
+logging.basicConfig(level=logging.INFO)
 
 class Central_Control_Server:
     
@@ -57,7 +59,7 @@ class Central_Control_Server:
         function: function to be decorated
         '''
         def publishing_function(payload):
-            print(payload)
+            logging.info(f"ACCESS_CODE {payload}")
             self.mqtt_handler.publish(topic,function(payload))
         
         return publishing_function

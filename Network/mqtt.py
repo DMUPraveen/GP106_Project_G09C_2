@@ -91,7 +91,7 @@ class MQTT_Handler(mqtt.Client):
         """
         topic = msg.topic
         message = str(msg.payload.decode("utf-8"))
-        logging.debug(topic,message)
+        logging.debug(f"{topic=},{message=}")
         if(topic in self.events):
             for func in self.events[topic]:
                 func(message)

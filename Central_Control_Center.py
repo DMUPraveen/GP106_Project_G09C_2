@@ -20,7 +20,7 @@ MQTT_PORT = 8883
 
 COM_PORT = "COM4"
 MAX_TEMP = 36
-LDR_THRESHOLD = 0.5
+LDR_THRESHOLD = 0.3
 ####################################################
 TEMP_REPORT_DELAY = 1  # The temperature is sent to the server every second so as not to
 # overload traffic
@@ -168,6 +168,7 @@ class System:
                 self.event_manager.publish_event(NOFIRE)
             ldr = self.hardware.get_ldr()
             if(ldr is not None):
+                #print(ldr,LDR_THRESHOLD)
                 self.morse_decoder.get_signal(ldr > LDR_THRESHOLD, time.time())
 
             if(self.hardware.button_pressed()):
