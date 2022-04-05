@@ -24,6 +24,7 @@ class CCC:
     RAISE_ALARM = _ccc("ALARM_RAISE") # ccc->
     LOCKDOWN = _ccc("LOCKDOWN")
     STATUS = _ccc("STATUS")
+    FIRE_ALARM = _ccc("FIRE")
     #Topic Payloads
     ACESS_GRANTED = "GRANTED"
     ACESS_DENIED = "DENIED"
@@ -31,6 +32,7 @@ class CCC:
     UNLOCKED = "UNLOCKED"
     SECURE = "SECURE"
     INSECURE = "INSECURE"
+    FIRE_PAYLOAD = "FIRE"
 
 
 class CCS:

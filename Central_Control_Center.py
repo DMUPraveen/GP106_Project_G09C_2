@@ -117,7 +117,8 @@ class System:
         self.event_manager.on_event(FIRE, self.fire_alarm.request_on)
         self.event_manager.on_event(LOCK, self.system_lock)
         self.event_manager.on_event(NOFIRE,self.fire_alarm.request_off)
-
+        self.event_manager.on_event(FIRE, self.mqtt_handler.publish(tp.CCC.FIRE_ALARM,tp.CCC.FIRE_PAYLOAD))
+        
     def initialize_hardware(self):
         '''
         Intializing the hardware (also wating while input is stable)
