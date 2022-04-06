@@ -111,3 +111,29 @@ class Event_Manager:
                 func()
                 
 
+class TriggerOnce:
+    '''
+    This is also a switch type mechanism but it can be turned on or off only once
+    repeated call to on won't cause the system to call the asociated function repeatedly
+    It is only called once for the first on call after the last off call. Same of off
+    '''
+    def __init__(self,on_func:Callable[[],None],off_func:Callable[[],None],default_state=False):
+        self.on_func = on_func
+        self.off_func = off_func
+        self.state = default_state #default state is off
+
+    def on(self):
+        '''
+        Only calls on_func if already off
+        '''
+        if(not self.state):
+            self.state = True
+            self.on_func()
+
+    def off(self):
+        '''
+        Only calls off_func if already on
+        '''
+        if(self.state):
+            self.state = False
+            self.off_func()

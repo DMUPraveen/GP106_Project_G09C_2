@@ -26,6 +26,7 @@ class Hardware:
             
             The systme is locked on startup
         '''
+        self.com_port = com_port
         self.board = Arduino(com_port)
         self.ldr_pin = self.board.get_pin(LDR_PIN)
         self.red_pin = self.board.get_pin(LED_RED)
@@ -127,3 +128,21 @@ class Hardware:
         self.locked = True
         self.green_on()
         self.red_off()
+
+    def try_reconnect(self):
+        while True:
+            try:
+                self.board = Arduino(self.com_port)
+                self.ldr_pin = self.board.get_pin(LDR_PIN)
+                self.red_pin = self.board.get_pin(LED_RED)
+                self.gree_pin = self.board.get_pin(LED_GREEN)
+                self.thermistor = self.board.get_pin(THERMISTOR_PIN)
+                self.buzzer = self.board.get_pin(BUZZER_PIN)
+                self.button = self.board.get_pin(BUTTON_PIN)
+                if(self.locked):
+                    self.lock()
+                else:
+                    self.unlock()
+                return True
+            except Exception as e:
+                return False

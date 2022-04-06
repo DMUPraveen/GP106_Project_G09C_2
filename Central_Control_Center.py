@@ -5,7 +5,7 @@ from morse.Morse_Decoder import Morse_Decoder
 from Network.mqtt import MQTT_Handler
 from Hardware.hardware import Hardware
 import time
-from Utility.Event import Event_Manager, TimedEventManager
+from Utility.Event import Event_Manager, TimedEventManager,TriggerOnce
 from Utility.Resource import Multi_Or_Switch
 import logging
 import Topics as tp
@@ -62,13 +62,13 @@ class System:
         self.network_alarm = self.buzzer_switch.get_handle()
 
         self.security = True  # Indicates whether the system is secure and running
-        self.locked = True  # Indicates whether the systme is locked or not
-
+        self.locked = False  # Indicates whether the systme is locked or not
+        self.system_lock() #sets lock to True
         self.initialize_mqtt_handler()
         self.initialize_hardware()
         self.intialize_event_managers()
 
-        self.system_lock()
+        
         self.mqtt_handler.publish(tp.CCC.STATUS,tp.CCC.SECURE)
 
     def initialize_mqtt_handler(self):
@@ -112,12 +112,21 @@ class System:
         # Timed events
         self.timed_events.add_event(
             TEMP_REPORT_DELAY, publish_temperature_data)
+        
+        #Trigger once objects
+        fire_report = TriggerOnce(
+            on_func=lambda: self.mqtt_handler.publish(tp.CCC.FIRE_ALARM,tp.CCC.FIRE_PAYLOAD),
+            off_func=lambda : self.mqtt_handler.publish(tp.CCC.FIRE_ALARM,tp.CCC.NO_FIRE_PAYLOAD)
+        )                             
 
         # Event Managers
         self.event_manager.on_event(FIRE, self.fire_alarm.request_on)
+        self.event_manager.on_event(FIRE, fire_report.on)
+
         self.event_manager.on_event(LOCK, self.system_lock)
+        
         self.event_manager.on_event(NOFIRE,self.fire_alarm.request_off)
-        self.event_manager.on_event(FIRE, self.mqtt_handler.publish(tp.CCC.FIRE_ALARM,tp.CCC.FIRE_PAYLOAD))
+        self.event_manager.on_event(NOFIRE,fire_report.off)
         
     def initialize_hardware(self):
         '''
@@ -162,23 +171,39 @@ class System:
         '''
         The main loop of the Central Control Center
         '''
+        security_trigger = TriggerOnce(
+            on_func=lambda : self.mqtt_handler.publish(tp.CCC.STATUS,tp.CCC.INSECURE),
+            off_func=lambda : self.mqtt_handler.publish(tp.CCC.STATUS,tp.CCC.SECURE)
+        )
         while True:
-            self.timed_events.run()
-            temp = self.hardware.get_temp()
-            if(self.is_fire(temp)):
-                logger.debug("Fire")
-                self.event_manager.publish_event(FIRE)
-            else:
-                self.event_manager.publish_event(NOFIRE)
-            ldr = self.hardware.get_ldr()
-            if(ldr is not None):
-                #print(ldr,LDR_THRESHOLD)
-                self.morse_decoder.get_signal(ldr > LDR_THRESHOLD, time.time())
+            try:
+                security_trigger.off()
+                self.timed_events.run()
+                temp = self.hardware.get_temp()
+                logger.debug(temp)
+                if(self.is_fire(temp)):
+                    logger.debug("Fire")
+                    self.event_manager.publish_event(FIRE)
+                else:
+                    self.event_manager.publish_event(NOFIRE)
+                ldr = self.hardware.get_ldr()
+                if(ldr is not None):
+                    #print(ldr,LDR_THRESHOLD)
+                    self.morse_decoder.get_signal(ldr > LDR_THRESHOLD, time.time())
 
-            if(self.hardware.button_pressed()):
-                self.system_unlock()
-                self.buzzer_switch.master_off()
-            self.hardware.update()
+                if(self.hardware.button_pressed()):
+                    self.system_unlock()
+                    self.buzzer_switch.master_off()
+                self.hardware.update()
+            except Exception as e:
+                logger.warning('System Compromised')
+                security_trigger.on()
+                while True:
+                    if(self.hardware.try_reconnect()):
+                        
+                        self.hardware.wait_while_input_stable()
+                        logger.info("Back up and running")
+                        break
 
 
 

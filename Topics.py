@@ -33,7 +33,7 @@ class CCC:
     SECURE = "SECURE"
     INSECURE = "INSECURE"
     FIRE_PAYLOAD = "FIRE"
-
+    NO_FIRE_PAYLOAD = "NO_FIRE"
 
 class CCS:
     _ccs = Topic_Wrapper('CCS')
