@@ -12,3 +12,12 @@ Alson contains supporting material such as Supporting Libraries and Modules, Doc
 All the required modules are given in requirements.txt. Our recommended way to run the programme is to make a virtual environment (using venv or similar method) and install the required packages using 
 
     pip install -r requirements.txt
+
+Password and user name for Central Control Server
+
+Username :- Pentagon
+password :- pentagonal123
+
+# Instructions for Documentation
+
+To open the documentation navigate to the docs folder and open the index.html file in your browser you will be greeted with an interactive documentation.
