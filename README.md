@@ -9,6 +9,6 @@ Contains code for the following components of the Pentagon Security System
 
 Alson contains supporting material such as Supporting Libraries and Modules, Documentation, Tests etc.
 
-All the required modules are given in requirements.txt. Our recommended way to run the modules is to make a virtual environment and install the required packages using 
+All the required modules are given in requirements.txt. Our recommended way to run the programme is to make a virtual environment (using venv or similar method) and install the required packages using 
 
     pip install -r requirements.txt
