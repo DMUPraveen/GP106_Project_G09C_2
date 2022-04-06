@@ -7,6 +7,7 @@ from Hardware.hardware import Hardware
 import time
 from Utility.Event import Event_Manager, TimedEventManager
 from Utility.Resource import Multi_Or_Switch
+import logging
 import Topics as tp
 
 
@@ -28,11 +29,12 @@ TEMP_REPORT_DELAY = 1  # The temperature is sent to the server every second so a
 
 ############System Specific Events#########
 FIRE = "FIRE"
-NOFIRE = "FIRE"
+NOFIRE = "NOFIRE"
 LOCK = "LOCK"
 UNLOCK = "UNLOCK"
 
-
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 class System:
     def __init__(self, name:str, server_port:int, server_address:str, com_port:str):
         """
@@ -163,6 +165,7 @@ class System:
             self.timed_events.run()
             temp = self.hardware.get_temp()
             if(self.is_fire(temp)):
+                logger.debug("Fire")
                 self.event_manager.publish_event(FIRE)
             else:
                 self.event_manager.publish_event(NOFIRE)

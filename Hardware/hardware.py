@@ -93,7 +93,7 @@ class Hardware:
         '''
         Turns the buzzer off
         '''
-        self.buzzer.write(0)
+        self.buzzer.write(0.0)
 
     def button_pressed(self)->bool:
         '''
@@ -118,6 +118,7 @@ class Hardware:
         self.locked = True
         self.red_on()
         self.green_off()
+        self.buzzer_off()
 
     def unlock(self):
         '''
