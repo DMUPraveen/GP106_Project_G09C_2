@@ -1,6 +1,14 @@
-# GP106_Project_G09C Milestone 1
-Repository for group 9-C for the GP106 1st year mini project University of Peradeniya for milestone 1
+# GP106_Project_G09C Milestone 2
+Repository for group 9-C for the GP106 1st year mini project University of Peradeniya for milestone 2
 
-The following libraries need to be installed for this code to run
-1. paho-mqtt
-2. pyfirmata
+Contains code for the following components of the Pentagon Security System
+
+1. Central Control Center (CCC)
+2. Central Control Server (CCS)
+3. Morse Torch App (Bonus Feature)
+
+Alson contains supporting material such as Supporting Libraries and Modules, Documentation, Tests etc.
+
+All the required modules are given in requirements.txt. Our recommended way to run the modules is to make a virtual environment and install the required packages using 
+
+    pip install -r requirements.txt
