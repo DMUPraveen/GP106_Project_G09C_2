@@ -95,6 +95,21 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#TriggerOnce">TriggerOnce</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#TriggerOnce.__init__">TriggerOnce</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TriggerOnce.on">on</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TriggerOnce.off">off</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -228,6 +243,33 @@
             <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="n">event_name</span><span class="p">]:</span>
                 <span class="n">func</span><span class="p">()</span>
                 
+
+<span class="k">class</span> <span class="nc">TriggerOnce</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is also a switch type mechanism but it can be turned on or off only once</span>
+<span class="sd">    repeated call to on won&#39;t cause the system to call the asociated function repeatedly</span>
+<span class="sd">    It is only called once for the first on call after the last off call. Same of off</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">on_func</span><span class="p">:</span><span class="n">Callable</span><span class="p">[[],</span><span class="kc">None</span><span class="p">],</span><span class="n">off_func</span><span class="p">:</span><span class="n">Callable</span><span class="p">[[],</span><span class="kc">None</span><span class="p">],</span><span class="n">default_state</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_func</span> <span class="o">=</span> <span class="n">on_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">off_func</span> <span class="o">=</span> <span class="n">off_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">default_state</span> <span class="c1">#default state is off</span>
+
+    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Only calls on_func if already off</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_func</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Only calls off_func if already on</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">off_func</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -681,6 +723,130 @@ function ()-&gt;None   : function to be called when the event_name occurs
         </details>
 
             <div class="docstring"><p>Create and event of the name event_name, all functions under event_name will be called</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="TriggerOnce">
+                                <div class="attr class">
+        <a class="headerlink" href="#TriggerOnce">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">TriggerOnce</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TriggerOnce</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is also a switch type mechanism but it can be turned on or off only once</span>
+<span class="sd">    repeated call to on won&#39;t cause the system to call the asociated function repeatedly</span>
+<span class="sd">    It is only called once for the first on call after the last off call. Same of off</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">on_func</span><span class="p">:</span><span class="n">Callable</span><span class="p">[[],</span><span class="kc">None</span><span class="p">],</span><span class="n">off_func</span><span class="p">:</span><span class="n">Callable</span><span class="p">[[],</span><span class="kc">None</span><span class="p">],</span><span class="n">default_state</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_func</span> <span class="o">=</span> <span class="n">on_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">off_func</span> <span class="o">=</span> <span class="n">off_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">default_state</span> <span class="c1">#default state is off</span>
+
+    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Only calls on_func if already off</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_func</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Only calls off_func if already on</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">off_func</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>This is also a switch type mechanism but it can be turned on or off only once
+repeated call to on won't cause the system to call the asociated function repeatedly
+It is only called once for the first on call after the last off call. Same of off</p>
+</div>
+
+
+                            <div id="TriggerOnce.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TriggerOnce.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">TriggerOnce</span><span class="signature">(
+    on_func: Callable[[], NoneType],
+    off_func: Callable[[], NoneType],
+    default_state=False
+)</span>
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">on_func</span><span class="p">:</span><span class="n">Callable</span><span class="p">[[],</span><span class="kc">None</span><span class="p">],</span><span class="n">off_func</span><span class="p">:</span><span class="n">Callable</span><span class="p">[[],</span><span class="kc">None</span><span class="p">],</span><span class="n">default_state</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_func</span> <span class="o">=</span> <span class="n">on_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">off_func</span> <span class="o">=</span> <span class="n">off_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">default_state</span> <span class="c1">#default state is off</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="TriggerOnce.on" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TriggerOnce.on">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">on</span><span class="signature">(self)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Only calls on_func if already off</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_func</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Only calls on_func if already off</p>
+</div>
+
+
+                            </div>
+                            <div id="TriggerOnce.off" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TriggerOnce.off">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">off</span><span class="signature">(self)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Only calls off_func if already on</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">off_func</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Only calls off_func if already on</p>
 </div>
 
 

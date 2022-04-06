@@ -89,6 +89,9 @@
                                 <a class="variable" href="#CCC.STATUS">STATUS</a>
                         </li>
                         <li>
+                                <a class="variable" href="#CCC.FIRE_ALARM">FIRE_ALARM</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#CCC.ACESS_GRANTED">ACESS_GRANTED</a>
                         </li>
                         <li>
@@ -105,6 +108,12 @@
                         </li>
                         <li>
                                 <a class="variable" href="#CCC.INSECURE">INSECURE</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#CCC.FIRE_PAYLOAD">FIRE_PAYLOAD</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#CCC.NO_FIRE_PAYLOAD">NO_FIRE_PAYLOAD</a>
                         </li>
                 </ul>
 
@@ -261,6 +270,7 @@ Topics    </h1>
     <span class="n">RAISE_ALARM</span> <span class="o">=</span> <span class="n">_ccc</span><span class="p">(</span><span class="s2">&quot;ALARM_RAISE&quot;</span><span class="p">)</span> <span class="c1"># ccc-&gt;</span>
     <span class="n">LOCKDOWN</span> <span class="o">=</span> <span class="n">_ccc</span><span class="p">(</span><span class="s2">&quot;LOCKDOWN&quot;</span><span class="p">)</span>
     <span class="n">STATUS</span> <span class="o">=</span> <span class="n">_ccc</span><span class="p">(</span><span class="s2">&quot;STATUS&quot;</span><span class="p">)</span>
+    <span class="n">FIRE_ALARM</span> <span class="o">=</span> <span class="n">_ccc</span><span class="p">(</span><span class="s2">&quot;FIRE&quot;</span><span class="p">)</span>
     <span class="c1">#Topic Payloads</span>
     <span class="n">ACESS_GRANTED</span> <span class="o">=</span> <span class="s2">&quot;GRANTED&quot;</span>
     <span class="n">ACESS_DENIED</span> <span class="o">=</span> <span class="s2">&quot;DENIED&quot;</span>
@@ -268,7 +278,8 @@ Topics    </h1>
     <span class="n">UNLOCKED</span> <span class="o">=</span> <span class="s2">&quot;UNLOCKED&quot;</span>
     <span class="n">SECURE</span> <span class="o">=</span> <span class="s2">&quot;SECURE&quot;</span>
     <span class="n">INSECURE</span> <span class="o">=</span> <span class="s2">&quot;INSECURE&quot;</span>
-
+    <span class="n">FIRE_PAYLOAD</span> <span class="o">=</span> <span class="s2">&quot;FIRE&quot;</span>
+    <span class="n">NO_FIRE_PAYLOAD</span> <span class="o">=</span> <span class="s2">&quot;NO_FIRE&quot;</span>
 
 <span class="k">class</span> <span class="nc">CCS</span><span class="p">:</span>
     <span class="n">_ccs</span> <span class="o">=</span> <span class="n">Topic_Wrapper</span><span class="p">(</span><span class="s1">&#39;CCS&#39;</span><span class="p">)</span>
@@ -393,6 +404,7 @@ Topics    </h1>
     <span class="n">RAISE_ALARM</span> <span class="o">=</span> <span class="n">_ccc</span><span class="p">(</span><span class="s2">&quot;ALARM_RAISE&quot;</span><span class="p">)</span> <span class="c1"># ccc-&gt;</span>
     <span class="n">LOCKDOWN</span> <span class="o">=</span> <span class="n">_ccc</span><span class="p">(</span><span class="s2">&quot;LOCKDOWN&quot;</span><span class="p">)</span>
     <span class="n">STATUS</span> <span class="o">=</span> <span class="n">_ccc</span><span class="p">(</span><span class="s2">&quot;STATUS&quot;</span><span class="p">)</span>
+    <span class="n">FIRE_ALARM</span> <span class="o">=</span> <span class="n">_ccc</span><span class="p">(</span><span class="s2">&quot;FIRE&quot;</span><span class="p">)</span>
     <span class="c1">#Topic Payloads</span>
     <span class="n">ACESS_GRANTED</span> <span class="o">=</span> <span class="s2">&quot;GRANTED&quot;</span>
     <span class="n">ACESS_DENIED</span> <span class="o">=</span> <span class="s2">&quot;DENIED&quot;</span>
@@ -400,6 +412,8 @@ Topics    </h1>
     <span class="n">UNLOCKED</span> <span class="o">=</span> <span class="s2">&quot;UNLOCKED&quot;</span>
     <span class="n">SECURE</span> <span class="o">=</span> <span class="s2">&quot;SECURE&quot;</span>
     <span class="n">INSECURE</span> <span class="o">=</span> <span class="s2">&quot;INSECURE&quot;</span>
+    <span class="n">FIRE_PAYLOAD</span> <span class="o">=</span> <span class="s2">&quot;FIRE&quot;</span>
+    <span class="n">NO_FIRE_PAYLOAD</span> <span class="o">=</span> <span class="s2">&quot;NO_FIRE&quot;</span>
 </pre></div>
 
         </details>
@@ -497,6 +511,16 @@ Topics    </h1>
     
 
                             </div>
+                            <div id="CCC.FIRE_ALARM" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#CCC.FIRE_ALARM">#&nbsp;&nbsp</a>
+
+        <span class="name">FIRE_ALARM</span><span class="default_value"> = &#39;G9/CCC/FIRE&#39;</span>
+    </div>
+
+    
+    
+
+                            </div>
                             <div id="CCC.ACESS_GRANTED" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#CCC.ACESS_GRANTED">#&nbsp;&nbsp</a>
 
@@ -551,6 +575,26 @@ Topics    </h1>
                                             <div class="attr variable"><a class="headerlink" href="#CCC.INSECURE">#&nbsp;&nbsp</a>
 
         <span class="name">INSECURE</span><span class="default_value"> = &#39;INSECURE&#39;</span>
+    </div>
+
+    
+    
+
+                            </div>
+                            <div id="CCC.FIRE_PAYLOAD" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#CCC.FIRE_PAYLOAD">#&nbsp;&nbsp</a>
+
+        <span class="name">FIRE_PAYLOAD</span><span class="default_value"> = &#39;FIRE&#39;</span>
+    </div>
+
+    
+    
+
+                            </div>
+                            <div id="CCC.NO_FIRE_PAYLOAD" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#CCC.NO_FIRE_PAYLOAD">#&nbsp;&nbsp</a>
+
+        <span class="name">NO_FIRE_PAYLOAD</span><span class="default_value"> = &#39;NO_FIRE&#39;</span>
     </div>
 
     

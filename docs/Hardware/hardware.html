@@ -92,6 +92,9 @@
                         <li>
                                 <a class="function" href="#Hardware.unlock">unlock</a>
                         </li>
+                        <li>
+                                <a class="function" href="#Hardware.try_reconnect">try_reconnect</a>
+                        </li>
                 </ul>
 
             </li>
@@ -145,6 +148,7 @@ the hardware and etc.</p>
 <span class="sd">            </span>
 <span class="sd">            The systme is locked on startup</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">com_port</span> <span class="o">=</span> <span class="n">com_port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">Arduino</span><span class="p">(</span><span class="n">com_port</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ldr_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LDR_PIN</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">red_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_RED</span><span class="p">)</span>
@@ -212,7 +216,7 @@ the hardware and etc.</p>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Turns the buzzer off</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">button_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -237,6 +241,7 @@ the hardware and etc.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">red_on</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">green_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_off</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -245,6 +250,24 @@ the hardware and etc.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">green_on</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">red_off</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">try_reconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">Arduino</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">com_port</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ldr_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LDR_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">red_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_RED</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gree_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_GREEN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">thermistor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">THERMISTOR_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">BUZZER_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">BUTTON_PIN</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locked</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
 </pre></div>
 
         </details>
@@ -274,6 +297,7 @@ the hardware and etc.</p>
 <span class="sd">            </span>
 <span class="sd">            The systme is locked on startup</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">com_port</span> <span class="o">=</span> <span class="n">com_port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">Arduino</span><span class="p">(</span><span class="n">com_port</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ldr_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LDR_PIN</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">red_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_RED</span><span class="p">)</span>
@@ -341,7 +365,7 @@ the hardware and etc.</p>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Turns the buzzer off</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">button_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -366,6 +390,7 @@ the hardware and etc.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">red_on</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">green_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_off</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -374,6 +399,24 @@ the hardware and etc.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">green_on</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">red_off</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">try_reconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">Arduino</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">com_port</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ldr_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LDR_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">red_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_RED</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gree_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_GREEN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">thermistor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">THERMISTOR_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">BUZZER_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">BUTTON_PIN</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locked</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
 </pre></div>
 
         </details>
@@ -399,6 +442,7 @@ the hardware and etc.</p>
 <span class="sd">            </span>
 <span class="sd">            The systme is locked on startup</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">com_port</span> <span class="o">=</span> <span class="n">com_port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">Arduino</span><span class="p">(</span><span class="n">com_port</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ldr_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LDR_PIN</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">red_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_RED</span><span class="p">)</span>
@@ -634,7 +678,7 @@ This function when called waits in a blocking loop until it is</p>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Turns the buzzer off</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -714,6 +758,7 @@ else it returns falls</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">red_on</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">green_off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_off</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -747,6 +792,40 @@ else it returns falls</p>
             <div class="docstring"><p>Sets the system into unlock mode</p>
 </div>
 
+
+                            </div>
+                            <div id="Hardware.try_reconnect" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Hardware.try_reconnect">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">try_reconnect</span><span class="signature">(self)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">try_reconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">Arduino</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">com_port</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ldr_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LDR_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">red_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_RED</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gree_pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">LED_GREEN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">thermistor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">THERMISTOR_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buzzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">BUZZER_PIN</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">get_pin</span><span class="p">(</span><span class="n">BUTTON_PIN</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locked</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+</pre></div>
+
+        </details>
+
+    
 
                             </div>
                 </section>

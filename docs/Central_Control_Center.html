@@ -103,8 +103,9 @@ Central_Control_Center    </h1>
 <span class="kn">from</span> <span class="nn">Network.mqtt</span> <span class="kn">import</span> <span class="n">MQTT_Handler</span>
 <span class="kn">from</span> <span class="nn">Hardware.hardware</span> <span class="kn">import</span> <span class="n">Hardware</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">Utility.Event</span> <span class="kn">import</span> <span class="n">Event_Manager</span><span class="p">,</span> <span class="n">TimedEventManager</span>
+<span class="kn">from</span> <span class="nn">Utility.Event</span> <span class="kn">import</span> <span class="n">Event_Manager</span><span class="p">,</span> <span class="n">TimedEventManager</span><span class="p">,</span><span class="n">TriggerOnce</span>
 <span class="kn">from</span> <span class="nn">Utility.Resource</span> <span class="kn">import</span> <span class="n">Multi_Or_Switch</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">Topics</span> <span class="k">as</span> <span class="nn">tp</span>
 
 
@@ -118,7 +119,7 @@ Central_Control_Center    </h1>
 
 <span class="n">COM_PORT</span> <span class="o">=</span> <span class="s2">&quot;COM4&quot;</span>
 <span class="n">MAX_TEMP</span> <span class="o">=</span> <span class="mi">36</span>
-<span class="n">LDR_THRESHOLD</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">LDR_THRESHOLD</span> <span class="o">=</span> <span class="mf">0.3</span>
 <span class="c1">####################################################</span>
 <span class="n">TEMP_REPORT_DELAY</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># The temperature is sent to the server every second so as not to</span>
 <span class="c1"># overload traffic</span>
@@ -126,11 +127,12 @@ Central_Control_Center    </h1>
 
 <span class="c1">############System Specific Events#########</span>
 <span class="n">FIRE</span> <span class="o">=</span> <span class="s2">&quot;FIRE&quot;</span>
-<span class="n">NOFIRE</span> <span class="o">=</span> <span class="s2">&quot;FIRE&quot;</span>
+<span class="n">NOFIRE</span> <span class="o">=</span> <span class="s2">&quot;NOFIRE&quot;</span>
 <span class="n">LOCK</span> <span class="o">=</span> <span class="s2">&quot;LOCK&quot;</span>
 <span class="n">UNLOCK</span> <span class="o">=</span> <span class="s2">&quot;UNLOCK&quot;</span>
 
-
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">System</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">server_port</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">server_address</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">com_port</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -158,13 +160,13 @@ Central_Control_Center    </h1>
         <span class="bp">self</span><span class="o">.</span><span class="n">network_alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">get_handle</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">security</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Indicates whether the system is secure and running</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Indicates whether the systme is locked or not</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Indicates whether the systme is locked or not</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">()</span> <span class="c1">#sets lock to True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_mqtt_handler</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_hardware</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">intialize_event_managers</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">()</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">SECURE</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">initialize_mqtt_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -208,12 +210,22 @@ Central_Control_Center    </h1>
         <span class="c1"># Timed events</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">add_event</span><span class="p">(</span>
             <span class="n">TEMP_REPORT_DELAY</span><span class="p">,</span> <span class="n">publish_temperature_data</span><span class="p">)</span>
+        
+        <span class="c1">#Trigger once objects</span>
+        <span class="n">fire_report</span> <span class="o">=</span> <span class="n">TriggerOnce</span><span class="p">(</span>
+            <span class="n">on_func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_ALARM</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_PAYLOAD</span><span class="p">),</span>
+            <span class="n">off_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_ALARM</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">NO_FIRE_PAYLOAD</span><span class="p">)</span>
+        <span class="p">)</span>                             
 
         <span class="c1"># Event Managers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span><span class="o">.</span><span class="n">request_on</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">LOCK</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span><span class="o">.</span><span class="n">request_off</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">,</span> <span class="n">fire_report</span><span class="o">.</span><span class="n">on</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">LOCK</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span><span class="o">.</span><span class="n">request_off</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">,</span><span class="n">fire_report</span><span class="o">.</span><span class="n">off</span><span class="p">)</span>
+        
     <span class="k">def</span> <span class="nf">initialize_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Intializing the hardware (also wating while input is stable)</span>
@@ -257,21 +269,39 @@ Central_Control_Center    </h1>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        The main loop of the Central Control Center</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">security_trigger</span> <span class="o">=</span> <span class="n">TriggerOnce</span><span class="p">(</span>
+            <span class="n">on_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">INSECURE</span><span class="p">),</span>
+            <span class="n">off_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">SECURE</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_temp</span><span class="p">()</span>
-            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_fire</span><span class="p">(</span><span class="n">temp</span><span class="p">)):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">)</span>
-            <span class="n">ldr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_ldr</span><span class="p">()</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">ldr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">morse_decoder</span><span class="o">.</span><span class="n">get_signal</span><span class="p">(</span><span class="n">ldr</span> <span class="o">&gt;</span> <span class="n">LDR_THRESHOLD</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">security_trigger</span><span class="o">.</span><span class="n">off</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_temp</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_fire</span><span class="p">(</span><span class="n">temp</span><span class="p">)):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Fire&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">)</span>
+                <span class="n">ldr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_ldr</span><span class="p">()</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">ldr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="c1">#print(ldr,LDR_THRESHOLD)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">morse_decoder</span><span class="o">.</span><span class="n">get_signal</span><span class="p">(</span><span class="n">ldr</span> <span class="o">&gt;</span> <span class="n">LDR_THRESHOLD</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
 
-            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">button_pressed</span><span class="p">()):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">system_unlock</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">master_off</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">button_pressed</span><span class="p">()):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">system_unlock</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">master_off</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;System Compromised&#39;</span><span class="p">)</span>
+                <span class="n">security_trigger</span><span class="o">.</span><span class="n">on</span><span class="p">()</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">try_reconnect</span><span class="p">()):</span>
+                        
+                        <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">wait_while_input_stable</span><span class="p">()</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Back up and running&quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
 
 
 
@@ -321,13 +351,13 @@ Central_Control_Center    </h1>
         <span class="bp">self</span><span class="o">.</span><span class="n">network_alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">get_handle</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">security</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Indicates whether the system is secure and running</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Indicates whether the systme is locked or not</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Indicates whether the systme is locked or not</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">()</span> <span class="c1">#sets lock to True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_mqtt_handler</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_hardware</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">intialize_event_managers</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">()</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">SECURE</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">initialize_mqtt_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -371,12 +401,22 @@ Central_Control_Center    </h1>
         <span class="c1"># Timed events</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">add_event</span><span class="p">(</span>
             <span class="n">TEMP_REPORT_DELAY</span><span class="p">,</span> <span class="n">publish_temperature_data</span><span class="p">)</span>
+        
+        <span class="c1">#Trigger once objects</span>
+        <span class="n">fire_report</span> <span class="o">=</span> <span class="n">TriggerOnce</span><span class="p">(</span>
+            <span class="n">on_func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_ALARM</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_PAYLOAD</span><span class="p">),</span>
+            <span class="n">off_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_ALARM</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">NO_FIRE_PAYLOAD</span><span class="p">)</span>
+        <span class="p">)</span>                             
 
         <span class="c1"># Event Managers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span><span class="o">.</span><span class="n">request_on</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">LOCK</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span><span class="o">.</span><span class="n">request_off</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">,</span> <span class="n">fire_report</span><span class="o">.</span><span class="n">on</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">LOCK</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span><span class="o">.</span><span class="n">request_off</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">,</span><span class="n">fire_report</span><span class="o">.</span><span class="n">off</span><span class="p">)</span>
+        
     <span class="k">def</span> <span class="nf">initialize_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Intializing the hardware (also wating while input is stable)</span>
@@ -420,21 +460,39 @@ Central_Control_Center    </h1>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        The main loop of the Central Control Center</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">security_trigger</span> <span class="o">=</span> <span class="n">TriggerOnce</span><span class="p">(</span>
+            <span class="n">on_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">INSECURE</span><span class="p">),</span>
+            <span class="n">off_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">SECURE</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_temp</span><span class="p">()</span>
-            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_fire</span><span class="p">(</span><span class="n">temp</span><span class="p">)):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">)</span>
-            <span class="n">ldr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_ldr</span><span class="p">()</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">ldr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">morse_decoder</span><span class="o">.</span><span class="n">get_signal</span><span class="p">(</span><span class="n">ldr</span> <span class="o">&gt;</span> <span class="n">LDR_THRESHOLD</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">security_trigger</span><span class="o">.</span><span class="n">off</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_temp</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_fire</span><span class="p">(</span><span class="n">temp</span><span class="p">)):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Fire&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">)</span>
+                <span class="n">ldr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_ldr</span><span class="p">()</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">ldr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="c1">#print(ldr,LDR_THRESHOLD)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">morse_decoder</span><span class="o">.</span><span class="n">get_signal</span><span class="p">(</span><span class="n">ldr</span> <span class="o">&gt;</span> <span class="n">LDR_THRESHOLD</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
 
-            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">button_pressed</span><span class="p">()):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">system_unlock</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">master_off</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">button_pressed</span><span class="p">()):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">system_unlock</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">master_off</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;System Compromised&#39;</span><span class="p">)</span>
+                <span class="n">security_trigger</span><span class="o">.</span><span class="n">on</span><span class="p">()</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">try_reconnect</span><span class="p">()):</span>
+                        
+                        <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">wait_while_input_stable</span><span class="p">()</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Back up and running&quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
 </pre></div>
 
         </details>
@@ -476,13 +534,13 @@ Central_Control_Center    </h1>
         <span class="bp">self</span><span class="o">.</span><span class="n">network_alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">get_handle</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">security</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Indicates whether the system is secure and running</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Indicates whether the systme is locked or not</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Indicates whether the systme is locked or not</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">()</span> <span class="c1">#sets lock to True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_mqtt_handler</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_hardware</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">intialize_event_managers</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">()</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">SECURE</span><span class="p">)</span>
 </pre></div>
 
@@ -571,11 +629,21 @@ com_port (str)          : arduino comport
         <span class="c1"># Timed events</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">add_event</span><span class="p">(</span>
             <span class="n">TEMP_REPORT_DELAY</span><span class="p">,</span> <span class="n">publish_temperature_data</span><span class="p">)</span>
+        
+        <span class="c1">#Trigger once objects</span>
+        <span class="n">fire_report</span> <span class="o">=</span> <span class="n">TriggerOnce</span><span class="p">(</span>
+            <span class="n">on_func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_ALARM</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_PAYLOAD</span><span class="p">),</span>
+            <span class="n">off_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">FIRE_ALARM</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">NO_FIRE_PAYLOAD</span><span class="p">)</span>
+        <span class="p">)</span>                             
 
         <span class="c1"># Event Managers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span><span class="o">.</span><span class="n">request_on</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">,</span> <span class="n">fire_report</span><span class="o">.</span><span class="n">on</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">LOCK</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_lock</span><span class="p">)</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span><span class="o">.</span><span class="n">request_off</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">,</span><span class="n">fire_report</span><span class="o">.</span><span class="n">off</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -710,21 +778,39 @@ com_port (str)          : arduino comport
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        The main loop of the Central Control Center</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">security_trigger</span> <span class="o">=</span> <span class="n">TriggerOnce</span><span class="p">(</span>
+            <span class="n">on_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">INSECURE</span><span class="p">),</span>
+            <span class="n">off_func</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span><span class="n">tp</span><span class="o">.</span><span class="n">CCC</span><span class="o">.</span><span class="n">SECURE</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_temp</span><span class="p">()</span>
-            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_fire</span><span class="p">(</span><span class="n">temp</span><span class="p">)):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">)</span>
-            <span class="n">ldr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_ldr</span><span class="p">()</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">ldr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">morse_decoder</span><span class="o">.</span><span class="n">get_signal</span><span class="p">(</span><span class="n">ldr</span> <span class="o">&gt;</span> <span class="n">LDR_THRESHOLD</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">security_trigger</span><span class="o">.</span><span class="n">off</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timed_events</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_temp</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_fire</span><span class="p">(</span><span class="n">temp</span><span class="p">)):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Fire&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">FIRE</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">NOFIRE</span><span class="p">)</span>
+                <span class="n">ldr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">get_ldr</span><span class="p">()</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">ldr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="c1">#print(ldr,LDR_THRESHOLD)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">morse_decoder</span><span class="o">.</span><span class="n">get_signal</span><span class="p">(</span><span class="n">ldr</span> <span class="o">&gt;</span> <span class="n">LDR_THRESHOLD</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
 
-            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">button_pressed</span><span class="p">()):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">system_unlock</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">master_off</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">button_pressed</span><span class="p">()):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">system_unlock</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">buzzer_switch</span><span class="o">.</span><span class="n">master_off</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;System Compromised&#39;</span><span class="p">)</span>
+                <span class="n">security_trigger</span><span class="o">.</span><span class="n">on</span><span class="p">()</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">try_reconnect</span><span class="p">()):</span>
+                        
+                        <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">wait_while_input_stable</span><span class="p">()</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Back up and running&quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
 </pre></div>
 
         </details>

@@ -176,6 +176,11 @@
 <span class="sd">        Runs on connect</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Connected with result code &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">rc</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Subscribing to the topics again upon reconnect</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">client</span><span class="p">,</span><span class="n">userdata</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -183,7 +188,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">topic</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">topic</span>
         <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topic</span><span class="si">=}</span><span class="s2">,</span><span class="si">{</span><span class="n">message</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span><span class="n">topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="n">topic</span><span class="p">]:</span>
                 <span class="n">func</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -198,6 +203,7 @@
         <span class="k">while</span> <span class="p">(</span><span class="n">counter</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_count</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_server</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">my_port</span><span class="p">)</span>
+                <span class="k">return</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Reconnection Failed trying again&quot;</span><span class="p">)</span>
 
@@ -334,6 +340,11 @@
 <span class="sd">        Runs on connect</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Connected with result code &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">rc</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Subscribing to the topics again upon reconnect</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">client</span><span class="p">,</span><span class="n">userdata</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -341,7 +352,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">topic</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">topic</span>
         <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topic</span><span class="si">=}</span><span class="s2">,</span><span class="si">{</span><span class="n">message</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span><span class="n">topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="n">topic</span><span class="p">]:</span>
                 <span class="n">func</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -356,6 +367,7 @@
         <span class="k">while</span> <span class="p">(</span><span class="n">counter</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_count</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_server</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">my_port</span><span class="p">)</span>
+                <span class="k">return</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Reconnection Failed trying again&quot;</span><span class="p">)</span>
 
@@ -513,6 +525,11 @@ func  (str)-&gt;None   :   A function that takes in the message payload,
 <span class="sd">        Runs on connect</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Connected with result code &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">rc</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Subscribing to the topics again upon reconnect</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -538,7 +555,7 @@ func  (str)-&gt;None   :   A function that takes in the message payload,
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">topic</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">topic</span>
         <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topic</span><span class="si">=}</span><span class="s2">,</span><span class="si">{</span><span class="n">message</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span><span class="n">topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="n">topic</span><span class="p">]:</span>
                 <span class="n">func</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -571,6 +588,7 @@ func  (str)-&gt;None   :   A function that takes in the message payload,
         <span class="k">while</span> <span class="p">(</span><span class="n">counter</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_count</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_server</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">my_port</span><span class="p">)</span>
+                <span class="k">return</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Reconnection Failed trying again&quot;</span><span class="p">)</span>
 

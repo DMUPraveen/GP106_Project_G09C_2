@@ -99,6 +99,7 @@ Central_Control_Server    </h1>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="n">MQTT_NAME</span> <span class="o">=</span> <span class="s2">&quot;G9C_CCS&quot;</span>
 <span class="n">MQTT_SERVER</span> <span class="o">=</span> <span class="s2">&quot;vpn.ce.pdn.ac.lk&quot;</span>
@@ -106,6 +107,7 @@ Central_Control_Server    </h1>
 <span class="n">PASSWORD_FILE</span> <span class="o">=</span> <span class="s2">&quot;Passwords.json&quot;</span>
 <span class="n">SECURITY_BREACH_EVENT</span> <span class="o">=</span> <span class="s2">&quot;SECURITY_BREACH&quot;</span>
 
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">Central_Control_Server</span><span class="p">:</span>
     
@@ -147,7 +149,7 @@ Central_Control_Server    </h1>
 <span class="sd">        function: function to be decorated</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">def</span> <span class="nf">publishing_function</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ACCESS_CODE </span><span class="si">{</span><span class="n">payload</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">function</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">publishing_function</span>
@@ -233,7 +235,7 @@ Central_Control_Server    </h1>
 <span class="sd">        function: function to be decorated</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">def</span> <span class="nf">publishing_function</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ACCESS_CODE </span><span class="si">{</span><span class="n">payload</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">function</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">publishing_function</span>
@@ -349,7 +351,7 @@ Central_Control_Server    </h1>
 <span class="sd">        function: function to be decorated</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">def</span> <span class="nf">publishing_function</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ACCESS_CODE </span><span class="si">{</span><span class="n">payload</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_handler</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span><span class="n">function</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">publishing_function</span>
